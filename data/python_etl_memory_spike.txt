@@ -1,0 +1,6 @@
+A Python ETL service processing hourly billing records started failing in production after schema growth.
+The environment had limited container memory, pandas-based joins, and a strict 15-minute batch SLA.
+The problem was out-of-memory termination during wide-table merges.
+The solution was to switch to chunked reads, use typed columns, and replace one large merge with staged keyed aggregations.
+The mechanism was lowering peak resident memory and reducing temporary dataframe duplication.
+The result was successful completion within SLA and 52% lower memory usage, but debugging became more complex due to multi-stage pipelines.

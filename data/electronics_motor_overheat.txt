@@ -1,0 +1,6 @@
+In a battery-powered inspection drone, operators noticed intermittent motor shutdown after about 42 flight hours.
+The environment included high ambient heat, dust buildup near the motor vents, and a firmware controller running PWM at aggressive burst intervals.
+The problem was overheating that caused protective throttling and occasional emergency stop.
+The team applied a solution: add vent filters, tune PWM duty-cycle ramping, and introduce firmware temperature smoothing.
+The mechanism was to reduce thermal spikes and improve airflow while preserving thrust stability.
+The result was a 37% drop in thermal cutoff events and longer continuous flight windows, with a slight increase in maintenance time for filter cleaning.
