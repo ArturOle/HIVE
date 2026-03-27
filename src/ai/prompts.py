@@ -1,56 +1,64 @@
+"""Prompt contracts shared by writer and reader agents."""
+
+CONCEPT_KEYS = ("environment", "problem", "solution", "mechanism", "result")
 
 PROBLEM_DEFINITION = """
-A Problem is a specific tension or discrepancy between the Current State of an environment and a Desired State, where the environments existing constraints prevent an easy transition from one to the other.
-Environmental Context: A problem doesn't exist in a vacuum. For example, "it's raining" is not a problem for a fish; it's only a problem for a human trying to stay dry. The environment dictates whether a circumstance is a "feature" or a "bug."
-Reasoning Lead: To define a problem, you must identify the constraint. Ask: "What specific environmental factor (lack of money, time, physics, or social norms) is keeping us from the goal?"
+A problem is a specific tension between the current state and a desired state,
+where environmental constraints prevent an easy transition.
 """
 
 SOLUTION_DEFINITION = """
-A Solution is a targeted set of actions or changes designed to navigate or alter environmental constraints to bridge the gap between the current state and the desired state.
-Environmental Context: A solution must be viable within the environment. If you propose a high-tech digital app to solve a communication problem in a region without electricity, you haven't designed a solution; you've designed a fantasy. A true solution respects the resource limits and "physics" of its surroundings.
-Reasoning Lead: A solution is essentially a hypothesis. It says, "Given these environmental rules, if we apply X force at Y point, the friction should decrease."
+A solution is a targeted action set that works within environmental constraints
+to bridge the gap between current and desired states.
 """
 
 RESULT_DEFINITION = """
-The Result is the measurable and qualitative shift in the environment following the implementation of a solution, encompassing both the intended outcomes and the unintended ripple effects.
-Environmental Context: Every action has a reaction. The "Result" isn't just "The problem is gone." It's the new environment created by the solution. Sometimes a solution fixes one problem but creates a "Side-Effect Problem" (e.g., a medicine that cures a cough but makes you drowsy).
-Reasoning Lead: Results provide the feedback loop. You compare the Result back to the original Problem. If the friction still exists—or if the environment has become more unstable—the reasoning process begins again.
+A result is the measurable and qualitative shift after a solution is applied,
+including both intended outcomes and unintended side effects.
 """
 
 WRITER_DISCOVERY_PROMPT = """
-Your role is to extract the problem, solution, and result given presented enviroment from the text into a structured JSON object.
-Here are definitions of the problem, solution, and result:
+You extract knowledge from text into a strict JSON object.
+
+Definitions:
 {problem_definition}
 {solution_definition}
 {result_definition}
 
-Here is the enviroment:
-{enviroment}
+Environment context:
+{environment}
 
-The JSON object should have the following structure:
-{
-    "environment": "The constraints, rules, and context of the situation, topic and theme.",
-    "problem": "The specific tension/gap identified.",
-    "solution": "The action taken.",
-    "mechanism": "Why this specific solution was expected to overcome the environmental constraints.",
-    "result": "The measurable outcome and any ripple effects."
-}
+Environment deduction rules:
+- If `environment` is empty, generic, or not explicitly provided, infer it from the text.
+- Infer only the local context relevant to the extracted problem/solution/result.
+- Ignore unrelated sections/chapters; select only the environment tied to the specific tip/case.
+- Environment may include domain artifacts (device type, runtime/language, identifiers,
+  operating conditions, constraints, and usage history) when relevant.
 
-The text to analyze is:
+Return ONLY valid JSON with this exact shape:
+{{
+  "environment": "constraints, rules, and context",
+  "problem": "the tension or gap",
+  "solution": "the action taken",
+  "mechanism": "why this should work under the environment",
+  "result": "observed outcome and ripple effects"
+}}
+
+Text:
 {text}
 """
 
-
 WRITER_REFLECTION_PROMPT = """
-Your role is to reflect if solution for the problem in given enviroment and grade it from 0.0 to 5.0 based on the result.
+You evaluate whether the solution resolved the problem in the environment.
+Grade from 0.0 to 5.0 based on result quality.
 
 Grading scale:
-0 - solution made the problem worse.
-1 - solution did not solve the problem.
-2 - solution solved the problem with high amount of effort, cost, time and level of complexity.
-3 - solution solved the problem, but with additional effort, cost, time and moderate level of complexity.
-4 - solution solved the problem with no downside.
-5 - solution solved the problem, increased efficiency, effectiveness, productivity, etc. and/or solved additional problems.
+0: solution made the problem worse
+1: solution did not solve the problem
+2: solved with high effort/cost/complexity
+3: solved with moderate overhead
+4: solved with no meaningful downside
+5: solved and improved efficiency/effectiveness or solved additional problems
 
 Problem:
 {problem}
@@ -58,17 +66,37 @@ Problem:
 Solution:
 {solution}
 
+Mechanism:
+{mechanism}
+
 Result:
 {result}
 
-Enviroment:
-{enviroment}
+Environment:
+{environment}
 
-Result should be a structured JSON object with the following structure:
-{
-    "grade": 0.0,
-    "reasoning": "Detailed justification of the grade based on efficiency and side effects.",
-    "key_lesson": "The 'heuristic' or rule of thumb learned from this experience.",
-    "risk_factors": "What environmental changes would degrade the solution's grade?"
-}
+Return ONLY valid JSON with this exact shape:
+{{
+  "grade": 0.0,
+  "reasoning": "detailed justification",
+  "key_lesson": "portable heuristic learned",
+  "risk_factors": "environmental changes that may degrade results"
+}}
+"""
+
+READER_CONCEPT_PARSE_PROMPT = """
+Extract any available concept fragments from the user query.
+Use null when a concept is missing.
+
+Return ONLY valid JSON with this exact shape:
+{{
+  "environment": "string or null",
+  "problem": "string or null",
+  "solution": "string or null",
+  "mechanism": "string or null",
+  "result": "string or null"
+}}
+
+User query:
+{query}
 """
