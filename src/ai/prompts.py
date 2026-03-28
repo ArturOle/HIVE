@@ -17,6 +17,14 @@ A result is the measurable and qualitative shift after a solution is applied,
 including both intended outcomes and unintended side effects.
 """
 
+MECHANISM_DEFINITION = """
+
+"""
+
+REFLECTION_DEFINITION = """
+
+"""
+
 WRITER_DISCOVERY_PROMPT = """
 You extract knowledge from text into a strict JSON object.
 

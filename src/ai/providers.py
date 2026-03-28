@@ -77,7 +77,7 @@ class GeminiProviderConfig:
 
     @classmethod
     def from_env(cls) -> "GeminiProviderConfig":
-        api_key = os.getenv("GEMINI_API_KEY", "AIzaSyD0ESsX9xWnlGKGOIX7KUknj_CBGZNGcF0").strip() or os.getenv(
+        api_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv(
             "GOOGLE_API_KEY", ""
         ).strip()
         if not api_key:
