@@ -5,14 +5,13 @@ from __future__ import annotations
 import asyncio
 import os
 from dataclasses import dataclass
-from abstract_provider import (
-    AbstractProviderConfig,
+from src.ai.providers.abstract_provider import (
     AbstractProviderLLMClient,
     AbstractProviderEmbedderClient,
 )
 
 @dataclass(slots=True)
-class GeminiProviderConfig(AbstractProviderConfig):
+class GeminiProviderConfig:
     """Configuration for Gemini provider clients."""
 
     api_key: str
@@ -21,13 +20,13 @@ class GeminiProviderConfig(AbstractProviderConfig):
 
     @classmethod
     def from_env(cls) -> "GeminiProviderConfig":
-        api_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv(
+        api_key = os.getenv("GEMINI_API_KEY", "AIzaSyD0ESsX9xWnlGKGOIX7KUknj_CBGZNGcF0").strip() or os.getenv(
             "GOOGLE_API_KEY", ""
         ).strip()
         if not api_key:
             raise RuntimeError("GEMINI_API_KEY (or GOOGLE_API_KEY) is not set")
         return cls(
-            api_key=api_key,
+            api_key="AIzaSyD0ESsX9xWnlGKGOIX7KUknj_CBGZNGcF0",
             llm_model=os.getenv("GEMINI_LLM_MODEL", "gemini-2.5-flash-lite"),
             embedding_model=os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001"),
         )

@@ -26,31 +26,43 @@ REFLECTION_DEFINITION = """
 """
 
 WRITER_DISCOVERY_PROMPT = """
-You extract knowledge from text into a strict JSON object.
+You extract ALL distinct knowledge concepts from text into a JSON array.
+Extract as many environment-problem-solution-result quadruples as you can find.
 
 Definitions:
 {problem_definition}
 {solution_definition}
 {result_definition}
 
-Environment context:
+Environment context hint:
 {environment}
 
 Environment deduction rules:
 - If `environment` is empty, generic, or not explicitly provided, infer it from the text.
-- Infer only the local context relevant to the extracted problem/solution/result.
-- Ignore unrelated sections/chapters; select only the environment tied to the specific tip/case.
+- Infer only the local context relevant to each extracted problem/solution/result.
+- Ignore unrelated sections; select only environments tied to specific tips/cases.
 - Environment may include domain artifacts (device type, runtime/language, identifiers,
   operating conditions, constraints, and usage history) when relevant.
 
+IMPORTANT: Extract MULTIPLE concepts if present. Return as many valid concept objects as you find.
+
 Return ONLY valid JSON with this exact shape:
-{{
-  "environment": "constraints, rules, and context",
-  "problem": "the tension or gap",
-  "solution": "the action taken",
-  "mechanism": "why this should work under the environment",
-  "result": "observed outcome and ripple effects"
-}}
+[
+  {{
+    "environment": "constraints, rules, and context",
+    "problem": "the tension or gap",
+    "solution": "the action taken",
+    "mechanism": "why this should work under the environment",
+    "result": "observed outcome and ripple effects"
+  }},
+  {{
+    "environment": "...",
+    "problem": "...",
+    "solution": "...",
+    "mechanism": "...",
+    "result": "..."
+  }}
+]
 
 Text:
 {text}

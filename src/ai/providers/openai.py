@@ -2,33 +2,55 @@
 
 from __future__ import annotations
 
-import os
-from dataclasses import dataclass
-from abstract_provider import (
-    AbstractProviderConfig,
+from pydantic import Field, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from src.ai.providers.abstract_provider import (
     AbstractProviderLLMClient,
     AbstractProviderEmbedderClient,
 )
 
 
-@dataclass(slots=True)
-class OpenAIProviderConfig(AbstractProviderConfig):
-    """Configuration for OpenAI provider clients."""
+# class OpenAIProviderConfig(AbstractProviderConfig):
+#     """Configuration for OpenAI provider clients."""
 
-    api_key: str
-    llm_model: str = "gpt-4o-mini"
-    embedding_model: str = "text-embedding-3-small"
+#     api_key: str
+#     llm_model: str = "gpt-4o-mini"
+#     embedding_model: str = "text-embedding-3-small"
 
-    @classmethod
-    def from_env(cls) -> "OpenAIProviderConfig":
-        api_key = os.getenv("OPENAI_API_KEY", "").strip()
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY is not set")
-        return cls(
-            api_key=api_key,
-            llm_model=os.getenv("OPENAI_LLM_MODEL", "gpt-4o-mini"),
-            embedding_model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
-        )
+#     @classmethod
+#     def from_env(cls) -> "OpenAIProviderConfig":
+#         api_key = os.getenv("OPENAI_API_KEY", "").strip()
+#         if not api_key:
+#             raise RuntimeError("OPENAI_API_KEY is not set")
+#         return cls(
+#             api_key=api_key,
+#             llm_model=os.getenv("OPENAI_LLM_MODEL", "gpt-4o-mini"),
+#             embedding_model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+#         )
+class OpenAIProviderConfig(BaseSettings):
+    """Configuration for Gemini provider clients using Pydantic."""
+
+    # We use SecretStr to prevent the key from being accidentally printed in logs
+    api_key: SecretStr = Field(
+        alias="OPENAI_API_KEY", 
+        validation_alias="OPENAI_API_KEY"
+    )
+    
+    llm_model: str = Field(
+        default="gpt-4o-mini",
+        validation_alias="OPENAI_LLM_MODEL"
+    )
+    
+    embedding_model: str = Field(
+        default="text-embedding-3-small",
+        validation_alias="OPENAI_EMBEDDING_MODEL"
+    )
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore",      # Essential so it doesn't crash on Neo4j variables
+        case_sensitive=False
+    )
 
 
 class OpenAILLMClient(AbstractProviderLLMClient):

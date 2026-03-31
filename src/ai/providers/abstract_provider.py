@@ -1,20 +1,16 @@
 from abc import ABC, abstractmethod
 
 
-class AbstractProviderConfig(ABC):
-    @abstractmethod
-    def from_env(cls):
-        """Gets enviromental variables""" 
-
-
 class AbstractProviderLLMClient(ABC):
     @abstractmethod
-    def ainvoke(self, prompt):
+    async def ainvoke(self, prompt):
         """Makes request for AI response"""
+        pass
 
 
 class AbstractProviderEmbedderClient(ABC):
     @abstractmethod
-    def ainvoke(self, prompt):
+    async def embed(self, text):
         """Makes request for AI response"""
+        pass
 

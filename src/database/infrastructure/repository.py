@@ -51,6 +51,67 @@ class Neo4jRepository:
         def __init__(self, driver: Neo4jDriver):
             self.driver = driver
             self._logger = logger
+        
+        async def get_graph_snapshot(self):
+            nodes = await self.node_repo.get_all_nodes()
+            edges = await self.node_repo.get_all_relationships()
+            return {"nodes": nodes, "links": edges}
+
+        async def get_all_nodes(self) -> list[dict[str, Any]]:
+            """Fetch all nodes for visualization.
+            
+            Returns:
+                List of dicts containing id, labels, and properties.
+            """
+            query = """
+            MATCH (n)
+            RETURN elementId(n) as id, labels(n) as labels, properties(n) as props
+            """
+            
+            session = await self.driver.session()
+            try:
+                result = await session.run(query)
+                nodes = []
+                async for record in result:
+                    nodes.append({
+                        "id": record["id"],
+                        "labels": record["labels"],
+                        **record["props"]
+                    })
+                return nodes
+            finally:
+                await session.close()
+
+        async def get_all_relationships(self) -> list[dict[str, Any]]:
+            """Fetch all relationships for visualization.
+            
+            Returns:
+                List of dicts containing id, type, source, target, and properties.
+            """
+            query = """
+            MATCH (s)-[r]->(e)
+            RETURN elementId(r) as id, 
+                type(r) as type, 
+                elementId(s) as source, 
+                elementId(e) as target, 
+                properties(r) as props
+            """
+            
+            session = await self.driver.session()
+            try:
+                result = await session.run(query)
+                relationships = []
+                async for record in result:
+                    relationships.append({
+                        "id": record["id"],
+                        "type": record["type"],
+                        "source": record["source"],
+                        "target": record["target"],
+                        **record["props"]
+                    })
+                return relationships
+            finally:
+                await session.close()
 
         async def create_node(
             self,
@@ -225,7 +286,7 @@ class Neo4jRepository:
             try:
                 start = time.time()
                 result = await session.run(cypher, params or {})
-                records = await result.fetch(None)  # Fetch all
+                records = await result.data()  # Fetch all records
                 elapsed_ms = (time.time() - start) * 1000.0
 
                 return QueryResult(

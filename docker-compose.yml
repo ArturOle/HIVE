@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  neo4j:
+    image: neo4j:latest
+    container_name: relived-neo4j
+    environment:
+      # Auth - only essential setting
+      NEO4J_AUTH: neo4j/password
+
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+
+    volumes:
+      # Data persistence
+      - neo4j_data:/var/lib/neo4j/data
+      # Logs persistence
+      - neo4j_logs:/var/lib/neo4j/logs
+      # Import directory (optional, for bulk imports)
+      - neo4j_import:/var/lib/neo4j/import
+
+    networks:
+      - relived_network
+
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "password", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Optional: Add Bloom for visual graph exploration (requires Neo4j Enterprise or separate setup)
+  # neo4j-bloom:
+  #   image: gcr.io/neo4j-gke/neo4j-bloom:latest
+  #   container_name: relived-bloom
+  #   ports:
+  #     - "7473:7473"
+  #   depends_on:
+  #     - neo4j
+  #   networks:
+  #     - relived_network
+
+volumes:
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+  neo4j_import:
+    driver: local
+
+networks:
+  relived_network:
+    driver: bridge

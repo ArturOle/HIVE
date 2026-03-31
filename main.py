@@ -61,7 +61,7 @@ async def _run() -> None:
         llm = OpenAILLMClient(config)
         embedder = OpenAIEmbedderClient(config)
     elif args.provider == "gemini":
-        config = GeminiProviderConfig.from_env()
+        config = GeminiProviderConfig()
         llm = GeminiLLMClient(config)
         embedder = GeminiEmbedderClient(config)
 
