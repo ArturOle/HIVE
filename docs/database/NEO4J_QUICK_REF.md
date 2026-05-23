@@ -80,15 +80,26 @@ await db.reset_database()
 
 ## Configuration
 
+**Target profile** (`NEO4J_TARGET`):
+- `local` (default) — `bolt://localhost:7687` on host, `bolt://neo4j:7687` in Docker
+- `hosted` — remote Aura / cloud instance via `NEO4J_HOSTED_*` (see below)
+- `docker` — same as local (Compose service hostname when inside Docker)
+
 Environment variables (NEO4J_ prefix):
-- `NEO4J_URI` - Connection URI (default: bolt://localhost:7687)
+- `NEO4J_URI` - Connection URI (overrides local default when set)
 - `NEO4J_USERNAME` - Database user (default: neo4j)
 - `NEO4J_PASSWORD` - Database password (default: password)
 - `NEO4J_DATABASE` - Database name (default: neo4j)
 - `NEO4J_MAX_POOL_SIZE` - Connection pool size (default: 50)
 - `NEO4J_DEBUG` - Enable debug logging (default: false)
 
-Or use `.env` file or pass `Neo4jSettings` to constructor.
+**Hosted / Aura** (when `NEO4J_TARGET=hosted`):
+- `NEO4J_HOSTED_NAME` - Instance id → `neo4j+s://{id}.databases.neo4j.io`
+- `NEO4J_HOSTED_PASSWORD` - Database password (required)
+- `NEO4J_HOSTED_URI` - Full URI (optional, overrides `HOSTED_NAME`)
+- `NEO4J_HOSTED_USERNAME`, `NEO4J_HOSTED_DATABASE` - Optional overrides
+
+Or use `.env` file or pass `Neo4jSettings` / `Neo4jSettings.for_target("hosted")` to constructor.
 
 ## In Agents (with Orchestrator)
 

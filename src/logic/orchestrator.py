@@ -13,7 +13,6 @@ from src.database.manager import DatabaseManager
 @dataclass(slots=True)
 class OrchestratorConfig:
     """Execution config for read/write routing."""
-
     default_top_k: int | None = None
 
 

@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import os
 import torch
 from pathlib import Path
-from pydantic import Field, ConfigDict
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from src.ai.providers.abstract_provider import (
     AbstractProviderEmbedderClient,
@@ -156,3 +155,4 @@ class QwenEmbedderClient(AbstractProviderEmbedderClient):
         embedding_list = embeddings[0].cpu().tolist()
         
         return embedding_list
+

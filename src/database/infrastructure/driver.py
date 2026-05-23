@@ -9,7 +9,7 @@ import logging
 from typing import Optional
 
 from neo4j import AsyncDriver, AsyncGraphDatabase, AsyncSession
-from neo4j.exceptions import ServiceUnavailable, DriverError
+from neo4j.exceptions import AuthError, ServiceUnavailable, DriverError
 
 from src.database.config import Neo4jSettings
 
@@ -61,10 +61,19 @@ class Neo4jDriver:
         Returns:
             Singleton Neo4jDriver instance.
         """
-        if cls._instance is None:
-            async with cls._lock:
-                if cls._instance is None:
-                    cls._instance = cls(config)
+        async with cls._lock:
+            if cls._instance is None:
+                cls._instance = cls(config)
+            elif (
+                cls._instance.config.uri != config.uri
+                or cls._instance.config.username != config.username
+                or cls._instance.config.password != config.password
+                or cls._instance.config.database != config.database
+            ):
+                await cls._instance.close()
+                cls._instance = cls(config)
+            else:
+                cls._instance.config = config
         return cls._instance
 
     async def connect(self) -> AsyncDriver:
@@ -103,6 +112,22 @@ class Neo4jDriver:
                 await self._driver.verify_connectivity()
                 self._logger.info("Neo4j connection established and verified")
                 return self._driver
+
+            except AuthError as e:
+                hint = (
+                    "Neo4j authentication failed for "
+                    f"{self.config.connection_summary()}. "
+                )
+                if self.config.target == "hosted":
+                    hint += (
+                        "Check NEO4J_HOSTED_PASSWORD in .env matches your Aura instance "
+                        "(Aura Console → instance → Reset password). "
+                        "Restart the notebook kernel after updating .env."
+                    )
+                else:
+                    hint += "Check NEO4J_USERNAME and NEO4J_PASSWORD."
+                self._logger.error(hint)
+                raise RuntimeError(hint) from e
 
             except (ServiceUnavailable, DriverError) as e:
                 last_error = e

@@ -18,11 +18,11 @@ including both intended outcomes and unintended side effects.
 """
 
 MECHANISM_DEFINITION = """
-
+A mechanism is the reasoning behind the solution, an intuitive hypothesis of how the solution should work under the environment.
 """
 
 REFLECTION_DEFINITION = """
-
+A reflection is the evaluation of the mechanism against the result, a retrospective understanding of what went well and what could be improved.
 """
 
 WRITER_DISCOVERY_PROMPT = """

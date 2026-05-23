@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import Any, Protocol, TypedDict
 
 from langgraph.graph import END, START, StateGraph
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from src.ai.prompts import (
     PROBLEM_DEFINITION,
@@ -112,24 +112,6 @@ def _extract_json_object(raw: str) -> dict[str, Any]:
         return json.loads(raw[start : end + 1])
 
 
-def _heuristic_extract(text: str, environment_hint: str) -> WriterExtraction:
-    """Safe fallback extraction when no model is configured."""
-    sentence = text.strip().split(".")[0].strip() or text.strip()
-    inferred_environment = environment_hint.strip()
-    if inferred_environment.lower() in {"", "general", "unknown", "auto"}:
-        inferred_environment = (
-            "Inferred from text context: domain-specific operating constraints and "
-            "entities directly tied to the extracted problem-solution pair."
-        )
-    return WriterExtraction(
-        environment=inferred_environment,
-        problem=sentence or "unknown problem",
-        solution=sentence or "unknown solution",
-        mechanism="Solution should reduce the key constraint in this environment.",
-        result="Result not explicitly provided; inferred from the source text.",
-    )
-
-
 def build_writer_graph(
     db: DatabaseManager,
     llm: LLMClient | None = None,
@@ -146,10 +128,6 @@ def build_writer_graph(
             errors.append("Writer input text is empty.")
             return {"errors": errors}
 
-        if llm is None:
-            extraction = _heuristic_extract(text, environment)
-            return {"extractions": [extraction.model_dump()], "errors": errors}
-
         prompt = WRITER_DISCOVERY_PROMPT.format(
             problem_definition=PROBLEM_DEFINITION.strip(),
             solution_definition=SOLUTION_DEFINITION.strip(),
@@ -159,28 +137,16 @@ def build_writer_graph(
         )
         raw = await llm.ainvoke(prompt)
         extractions = []
+
+        # Parse as JSON array
+        raw_data = json.loads(raw)
+        if not isinstance(raw_data, list):
+            # If it's a single object, wrap it in a list
+            raw_data = [raw_data]
         
-        # Add validation for empty response
-        if not raw or not raw.strip():
-            logger.warning("LLM returned empty response. Using fallback extraction.")
-            extraction = _heuristic_extract(text, environment)
-            extractions = [extraction.model_dump()]
-            return {"extractions": extractions, "errors": errors}
-        
-        try:
-            # Parse as JSON array
-            raw_data = json.loads(raw)
-            if not isinstance(raw_data, list):
-                # If it's a single object, wrap it in a list
-                raw_data = [raw_data]
-            
-            for item in raw_data:
-                extraction = WriterExtraction.model_validate(item)
-                extractions.append(extraction.model_dump())
-        except (ValueError, ValidationError, json.JSONDecodeError) as exc:
-            logger.warning("Discovery parse failed, fallback enabled: %s\nRaw response: %s", exc, raw[:500])
-            extraction = _heuristic_extract(text, environment)
-            extractions = [extraction.model_dump()]
+        for item in raw_data:
+            extraction = WriterExtraction.model_validate(item)
+            extractions.append(extraction.model_dump())
         
         if not extractions:
             errors.append("No extractions produced from discovery node.")
@@ -198,16 +164,6 @@ def build_writer_graph(
         reflections = []
         for extraction_raw in extractions_raw:
             extraction = WriterExtraction.model_validate(extraction_raw)
-            
-            if llm is None:
-                reflection = WriterReflection(
-                    grade=3.0,
-                    reasoning="Fallback reflection: moderate confidence due to missing LLM.",
-                    key_lesson="Measure outcomes and iterate in the same environment.",
-                    risk_factors="Changes in constraints may invalidate this solution.",
-                )
-                reflections.append(reflection.model_dump())
-                continue
 
             prompt = WRITER_REFLECTION_PROMPT.format(
                 problem=extraction.problem,
@@ -217,29 +173,8 @@ def build_writer_graph(
                 environment=extraction.environment,
             )
             raw = await llm.ainvoke(prompt)
-            
-            # Check for empty response
-            if not raw or not raw.strip():
-                logger.warning("LLM returned empty response for reflection. Using fallback.")
-                reflection = WriterReflection(
-                    grade=2.5,
-                    reasoning="LLM returned empty response.",
-                    key_lesson="Check LLM provider configuration and API keys.",
-                    risk_factors="LLM service may be unavailable or improperly configured.",
-                )
-                reflections.append(reflection.model_dump())
-                continue
-            
-            try:
-                reflection = WriterReflection.model_validate(_extract_json_object(raw))
-            except (ValueError, ValidationError) as exc:
-                logger.warning("Reflection parse failed for extraction, using fallback grade: %s\nRaw response: %s", exc, raw[:500])
-                reflection = WriterReflection(
-                    grade=2.5,
-                    reasoning="Model output parse failure; defaulted to conservative grade.",
-                    key_lesson="Capture clean metrics before grading outcome quality.",
-                    risk_factors="Unknown due to incomplete reflection output.",
-                )
+
+            reflection = WriterReflection.model_validate(_extract_json_object(raw))
             reflections.append(reflection.model_dump())
         
         return {"reflections": reflections, "errors": errors}

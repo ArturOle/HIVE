@@ -9,7 +9,7 @@ Main entry point: DatabaseManager
 """
 
 from .manager import DatabaseManager
-from .config import Neo4jSettings
+from .config import Neo4jSettings, Neo4jTargetMode, load_project_env
 from .domain import (
     Node,
     Relationship,
@@ -23,6 +23,8 @@ from .domain import (
 __all__ = [
     "DatabaseManager",
     "Neo4jSettings",
+    "Neo4jTargetMode",
+    "load_project_env",
     # Domain
     "Node",
     "Relationship",
