@@ -1,54 +1,119 @@
 version: "3.9"
 
 services:
+  backend_api:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    container_name: relived-backend
+    
+    # ─── GPU ALLOCATION ──────────────────────────────────────────────────
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # ─────────────────────────────────────────────────────────────────────
+
+    environment:
+      # Neo4j Configuration - use hosted by default, local for development
+      NEO4J_TARGET: ${NEO4J_TARGET:-hosted}
+      
+      # Hosted Neo4j (Neo4j Aura)
+      NEO4J_HOSTED_NAME: ${NEO4J_HOSTED_NAME:-}
+      NEO4J_HOSTED_URI: ${NEO4J_HOSTED_URI:-}
+      NEO4J_HOSTED_USERNAME: ${NEO4J_HOSTED_USERNAME:-neo4j}
+      NEO4J_HOSTED_PASSWORD: ${NEO4J_HOSTED_PASSWORD:-}
+      NEO4J_HOSTED_DATABASE: ${NEO4J_HOSTED_DATABASE:-neo4j}
+      
+      # Local Neo4j (for development)
+      NEO4J_URI: ${NEO4J_URI:-bolt://neo4j:7687}
+      NEO4J_USERNAME: ${NEO4J_USERNAME:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-password}
+      
+      # LLM Providers
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      INCEPTION_API_KEY: ${INCEPTION_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+
+      # Qwen Local Provider Configurations (Optional overrides)
+      QWEN_DEVICE: "cuda"
+      QWEN_MODEL_CACHE_DIR: "/app/models/qwen"
+    
+    ports:
+      - "8000:8000"
+    
+    networks:
+      - relived_network
+    
+    command: uvicorn api:app --host 0.0.0.0 --port 8000
+    
+    volumes:
+      - ./backend:/app
+      - ./.env:/app/.env
+      # Persistent cache volume for HuggingFace/Qwen weights so they aren't deleted on rebuilds
+      - qwen_model_cache:/app/models/qwen
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: relived-frontend
+    environment:
+      BACKEND_URL: http://backend_api:8000
+    
+    ports:
+      - "8501:8501"
+    
+    depends_on:
+      backend_api:
+        condition: service_healthy
+    
+    networks:
+      - relived_network
+    
+    command: streamlit run src/main.py --server.port 8501 --server.address 0.0.0.0
+    
+    volumes:
+      - ./frontend:/app/frontend
+
+  # Optional: Local Neo4j for development (set NEO4J_TARGET=local to use)
   neo4j:
-    build: .
-    image: neo4j:latest
+    image: neo4j:5.15-community
     container_name: relived-neo4j
     environment:
-      # Auth - only essential setting
       NEO4J_AUTH: neo4j/password
-
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes"
     ports:
       - "7474:7474"  # HTTP
       - "7687:7687"  # Bolt
-
     volumes:
-      # Data persistence
       - neo4j_data:/var/lib/neo4j/data
-      # Logs persistence
       - neo4j_logs:/var/lib/neo4j/logs
-      # Import directory (optional, for bulk imports)
-      - neo4j_import:/var/lib/neo4j/import
-
     networks:
       - relived_network
-
     healthcheck:
       test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "password", "RETURN 1"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-
-  # Optional: Add Bloom for visual graph exploration (requires Neo4j Enterprise or separate setup)
-  # neo4j-bloom:
-  #   image: gcr.io/neo4j-gke/neo4j-bloom:latest
-  #   container_name: relived-bloom
-  #   ports:
-  #     - "7473:7473"
-  #   depends_on:
-  #     - neo4j
-  #   networks:
-  #     - relived_network
+    profiles:
+      - local  # Only start with: docker-compose --profile local up
 
 volumes:
   neo4j_data:
-    driver: local
   neo4j_logs:
-    driver: local
-  neo4j_import:
-    driver: local
+  qwen_model_cache:   # Declared the named persistent volume for your Qwen models
 
 networks:
   relived_network:

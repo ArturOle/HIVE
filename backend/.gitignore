@@ -3,6 +3,4 @@ __pycache__
 *.pyo
 .env
 .env*
-models/*
-Modelfile.*
-*.ipynb
+models/qwen/*

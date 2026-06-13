@@ -1,0 +1,1 @@
+streamlit run /home/r2/Documents/Projects/ReLived/frontend/src/main.py
