@@ -123,7 +123,6 @@ async def read(request: QueryRequest | None = None, query: str | None = None, to
     q = request.query
     k = request.top_k
 
-    
     try:
         result = await orchestrator.run_read(query=q, top_k=k)
         logging.info(f"Read result: {result}")
