@@ -110,13 +110,6 @@ def build_reader_graph(
 
     """Build and compile reader graph."""
     embedder_client = embedder
-    concept_labels = {
-        "environment": "Environment",
-        "problem": "Problem",
-        "solution": "Solution",
-        "mechanism": "Mechanism",
-        "result": "Result",
-    }
 
     async def parse_query_node(state: ReaderState) -> ReaderState:
         query = state.get("query", "").strip()

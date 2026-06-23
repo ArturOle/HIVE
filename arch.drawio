@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
-    <diagram id="l4Uq59FVKmeN3XscMa5x" name="Page-1">
-        <mxGraphModel dx="2584" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <diagram id="l4Uq59FVKmeN3XscMa5x" name="High level architecture - Modul level view">
+        <mxGraphModel dx="885" dy="581" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -129,11 +129,103 @@
                 <mxCell id="48" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry y="520" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="49" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;memory public domain 2&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="49" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;memory public domain 2&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="770" y="210" width="130" height="70" as="geometry"/>
                 </mxCell>
-                <mxCell id="50" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;memory public domain 3&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="50" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;memory public domain 3&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="920" y="210" width="130" height="70" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="lMhydhZdzbncOpKFynOI" name="AdvancedKnowledgeRetrieval">
+        <mxGraphModel dx="600" dy="581" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-8" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="huFHkIX4ThablSJ7sMAu-1" target="huFHkIX4ThablSJ7sMAu-7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-21" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;dashed=1;" parent="1" source="huFHkIX4ThablSJ7sMAu-1" target="huFHkIX4ThablSJ7sMAu-11" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="290" y="90"/>
+                            <mxPoint x="290" y="390"/>
+                            <mxPoint x="550" y="390"/>
+                            <mxPoint x="550" y="328"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-1" value="Evaluate Needs&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;User wants:&lt;/div&gt;&lt;div&gt;Solution&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Provided:&amp;nbsp;&lt;/div&gt;&lt;div&gt;Enviroment, Problem&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="140" y="60" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-6" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="huFHkIX4ThablSJ7sMAu-2" target="huFHkIX4ThablSJ7sMAu-1" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-2" value="Q" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=28;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="95" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-10" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="huFHkIX4ThablSJ7sMAu-7" target="huFHkIX4ThablSJ7sMAu-9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-17" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="huFHkIX4ThablSJ7sMAu-7" target="huFHkIX4ThablSJ7sMAu-15" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="470" y="90"/>
+                            <mxPoint x="470" y="40"/>
+                            <mxPoint x="650" y="40"/>
+                            <mxPoint x="650" y="90"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-22" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="huFHkIX4ThablSJ7sMAu-7" target="huFHkIX4ThablSJ7sMAu-11" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="470" y="90"/>
+                            <mxPoint x="470" y="190"/>
+                            <mxPoint x="550" y="190"/>
+                            <mxPoint x="550" y="242"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-7" value="Explore Knowledge&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Query by most similar Poblem &amp;amp; Enviroment&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Weighted by Needs&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="60" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-12" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" parent="1" source="huFHkIX4ThablSJ7sMAu-9" target="huFHkIX4ThablSJ7sMAu-11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-16" value="" style="edgeStyle=none;html=1;" parent="1" source="huFHkIX4ThablSJ7sMAu-9" target="huFHkIX4ThablSJ7sMAu-15" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-9" value="Write Response&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Prepare response based on extracted knowledge (hard requeiremnt)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="60" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-13" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;dashed=1;" parent="1" source="huFHkIX4ThablSJ7sMAu-11" target="huFHkIX4ThablSJ7sMAu-7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-11" value="Quality Assurance&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Check the reposne for:&lt;/div&gt;&lt;div&gt;1) Is information taken only from extracted knowledge?&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;2) Grade the level of cover for given question given extracted information&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="200" width="140" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-19" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="huFHkIX4ThablSJ7sMAu-15" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="860" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-15" value="Format Output&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Build an clean and structured response based on the Jinja2 template.&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="680" y="60" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-18" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.001;entryY=0.126;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="huFHkIX4ThablSJ7sMAu-1" target="huFHkIX4ThablSJ7sMAu-15" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="290" y="90"/>
+                            <mxPoint x="290" y="30"/>
+                            <mxPoint x="660" y="30"/>
+                            <mxPoint x="660" y="75"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="huFHkIX4ThablSJ7sMAu-20" value="A" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=28;" parent="1" vertex="1">
+                    <mxGeometry x="865" y="95" width="40" height="50" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
