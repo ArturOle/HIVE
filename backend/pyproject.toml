@@ -1,0 +1,31 @@
+[project]
+name = "hive-backend"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "ArturOle",email = "artur.oleksiski99@gmail.com"}
+]
+requires-python = ">=3.13"
+dependencies = [
+    "langgraph==1.1.3",
+    "langchain==1.2.13",
+    "langchain-openai==1.1.12",
+    "neo4j==6.1.0",
+    "pandas==3.0.1",
+    "pydantic==2.12.5",
+    "pydantic-settings==2.13.1",
+    "python-dotenv==1.2.2",
+    "openai",
+    "google-generativeai",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+
+    # Qwen3 Embedding fallback (optional, only needed if primary embedders unavailable)
+    "transformers>=4.36.0",
+    "torch>=2.0.0",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
