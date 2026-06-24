@@ -8,12 +8,12 @@ import json
 import logging
 
 from src.ai.providers import (
-    GeminiEmbedderClient,
     GeminiLLMClient,
     GeminiProviderConfig,
-    OpenAIEmbedderClient,
     OpenAILLMClient,
     OpenAIProviderConfig,
+    InceptionLLMClient,
+    InceptionProviderConfig,
 )
 from src.logic.orchestrator import AgentOrchestrator
 
@@ -44,7 +44,7 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--provider",
-        choices=["none", "openai", "gemini"],
+        choices=["none", "openai", "gemini", "inception"],
         default="none",
         help="LLM/embedding provider",
     )
@@ -55,15 +55,20 @@ async def _run() -> None:
     args = _parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     llm = None
-    embedder = None
-    if args.provider == "openai":
-        config = OpenAIProviderConfig.from_env()
-        llm = OpenAILLMClient(config)
-        embedder = OpenAIEmbedderClient(config)
-    elif args.provider == "gemini":
-        config = GeminiProviderConfig()
-        llm = GeminiLLMClient(config)
-        embedder = GeminiEmbedderClient(config)
+    match args.provider:
+        case "openai":
+            config = OpenAIProviderConfig.from_env()
+            llm = OpenAILLMClient(config)
+        case "gemini":
+            config = GeminiProviderConfig()
+            llm = GeminiLLMClient(config)
+        case "inception":
+            config = InceptionProviderConfig()
+            llm = InceptionLLMClient(config)
+        case "none":
+            pass
+        case _:
+            raise ValueError(f"Unknown provider: {args.provider}")
 
     async with AgentOrchestrator(llm=llm, embedder="qwen") as orchestrator:
         result = await orchestrator.run(

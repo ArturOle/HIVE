@@ -9,8 +9,5 @@ from src.ai.agents.constants import CONCEPT_LABELS
 
 async def evaluate_needs(
     state: AdvancedReaderAgentState,
-    db,
-    llm,
-    embedder_client,
 ):
     pass
