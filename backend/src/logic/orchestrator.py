@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from backend.src.ai.agents.reader.advanced_reader import build_advanced_reader_graph
+from backend.src.ai.agents.reader.reader_states import AdvancedReaderAgentContext
 from src.ai.reader import build_reader_graph
 from src.ai.writer import build_writer_graph
 from src.database.manager import DatabaseManager
@@ -31,9 +33,11 @@ class AgentOrchestrator:
         embedder: Any | None = None,
         config: OrchestratorConfig | None = None,
     ) -> None:
-        self.db = db or DatabaseManager()
-        self.llm = llm
-        self.embedder = embedder
+        self.context = AdvancedReaderAgentContext(
+            db=db or DatabaseManager(),
+            llm=llm,
+            embedder=embedder,
+        )
         self.config = config or OrchestratorConfig()
         self.writer_graph = None
         self.reader_graph = None
@@ -43,24 +47,31 @@ class AgentOrchestrator:
         """Initialize database and compile both graphs."""
         if self._initialized:
             return
+
         await self.db.initialize()
         await self.db.setup_database()
+
         self.writer_graph = build_writer_graph(
-            db=self.db,
-            llm=self.llm,
-            embedder=self.embedder,
+            db=self.context.db,
+            llm=self.context.llm,
+            embedder=self.context.embedder,
         )
         self.reader_graph = build_reader_graph(
-            db=self.db,
-            llm=self.llm,
-            embedder=self.embedder,
+            db=self.context.db,
+            llm=self.context.llm,
+            embedder=self.context.embedder,
         )
+        self.advanced_reader_graph = build_advanced_reader_graph(
+            context=self.context
+        )
+
         self._initialized = True
 
     async def run_write(self, text: str, environment_hint: str = "") -> dict[str, Any]:
         """Execute writer workflow."""
         if not self.writer_graph:
             raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
+
         result = await self.writer_graph.ainvoke(
             {
                 "text": text,
@@ -91,12 +102,18 @@ class AgentOrchestrator:
         top_k: int | None = None,
     ) -> dict[str, Any]:
         """Route execution to dedicated read or write graph."""
-        normalized_mode = mode.strip().lower()
-        if normalized_mode == "write":
-            return await self.run_write(text=text, environment_hint=environment_hint)
-        if normalized_mode == "read":
-            return await self.run_read(query=text, top_k=top_k)
-        raise ValueError("mode must be either 'read' or 'write'")
+
+        match mode.strip().lower():
+            case "write":
+                return await self.run_write(text=text, environment_hint=environment_hint)
+            case "read":
+                return await self.run_read(query=text, top_k=top_k)
+            case "advanced_read":
+                if not self.advanced_reader_graph:
+                    raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
+                return await self.run_advanced_read(query=text, top_k=top_k)
+            case _:
+                raise ValueError("mode must be either 'read' or 'write'")
 
     async def close(self) -> None:
         """Release orchestrator resources."""

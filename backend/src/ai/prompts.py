@@ -176,3 +176,39 @@ Return ONLY valid JSON with this exact shape:
   "caveats": "environmental limits, grade penalties, or transfer risks the user should know — null if none"
 }}
 """
+
+EVALUATE_NEEDS_PROMPT = """
+You analyze a user query against a knowledge base of environment-problem-solution-result concepts.
+
+Concept fields:
+environment - {environment}
+problem - {problem}
+solution - {solution}
+mechanism - {mechanism}
+result - {result}
+
+User query:
+{query}
+
+Definitions:
+- primary_intent: the concept field(s) the user most wants to discover, each with a weight reflecting
+  relative importance
+- additional_concepts: all other concept fields recognized in the query with their values and weights;
+  weights reflect how strongly each should constrain graph traversal, independently from 1 to 10
+- reasoning: one sentence explaining the retrieval decision and intent classification
+
+Return ONLY valid JSON with this exact shape:
+{{
+  "reasoning": "string",
+  "primary_intent": [
+    {{"field": "one of: environment, problem, solution, mechanism, result", "weight": 0.0}}
+  ],
+  "additional_concepts": {{
+    "environment": [{{"value": "string or null", "weight": 0.0}}],
+    "problem": [{{"value": "string or null", "weight": 0.0}}]
+    "solution": [{{"value": "string or null", "weight": 0.0}}],
+    "mechanism": [{{"value": "string or null", "weight": 0.0}}],
+    "result": [{{"value": "string or null", "weight": 0.0}}]
+  }}
+}}
+"""

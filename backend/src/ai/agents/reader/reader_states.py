@@ -4,6 +4,8 @@ from typing import Annotated
 from pydantic import BaseModel, Field
 
 from src.ai.models import Concept
+from src.database.manager import DatabaseManager
+from backend.src.ai.providers.abstract_provider import AbstractProviderLLMClient, AbstractProviderEmbedderClient
 
 
 class AdvancedReaderAgentState(BaseModel):
@@ -19,3 +21,11 @@ class AdvancedReaderAgentState(BaseModel):
 
     errors: list[str]
     llm_response: str | None
+
+
+class AdvancedReaderAgentContext(BaseModel):
+    """Context for the Advanced Reader Agent. """
+
+    db: "DatabaseManager"
+    llm: "AbstractProviderLLMClient"
+    embedder: "AbstractProviderEmbedderClient"
