@@ -16,6 +16,7 @@ class AdvancedReaderAgentState(BaseModel):
 
     search_target: str | None
     concepts_from_query: Annotated[dict[str, Concept], operator.or_] = Field(default_factory=dict)
+    eval_resoning: str
 
     concepts_from_knowledge_base: Annotated[dict[str, Concept], operator.or_] = Field(default_factory=dict)
 

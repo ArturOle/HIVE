@@ -200,15 +200,13 @@ Definitions:
 Return ONLY valid JSON with this exact shape:
 {{
   "reasoning": "string",
-  "primary_intent": [
-    {{"field": "one of: environment, problem, solution, mechanism, result", "weight": 0.0}}
-  ],
+  "primary_intent": {{"field": "one of: environment, problem, solution, mechanism, result", "weight": 0.0}},
   "additional_concepts": {{
-    "environment": [{{"value": "string or null", "weight": 0.0}}],
-    "problem": [{{"value": "string or null", "weight": 0.0}}]
-    "solution": [{{"value": "string or null", "weight": 0.0}}],
-    "mechanism": [{{"value": "string or null", "weight": 0.0}}],
-    "result": [{{"value": "string or null", "weight": 0.0}}]
+    "environment": [{{"value": "string or null", "weight": 0}}],
+    "problem": [{{"value": "string or null", "weight": 0}}]
+    "solution": [{{"value": "string or null", "weight": 0}}],
+    "mechanism": [{{"value": "string or null", "weight": 0}}],
+    "result": [{{"value": "string or null", "weight": 0}}]
   }}
 }}
 """
