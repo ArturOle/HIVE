@@ -25,7 +25,7 @@ class EvalFields(BaseModel):
 async def evaluate_needs(
     state: AdvancedReaderAgentState,
     context: AdvancedReaderAgentContext
-):
+) -> dict[str, any]:
     """ Evaluate the needs of the user based on the query and knowledge base.
     This function analyses the user's query for the target concept and the provided hints/context for relevant concepts.
     
@@ -35,7 +35,8 @@ async def evaluate_needs(
     
     """
     user_query = state.get("query", "").strip()
-    errors = errors = list(state.get("errors", []))
+    errors = list(state.get("errors", []))
+    user_query_embedding = await context.embedder.embed(user_query)
 
     if not user_query:
         errors.append("Reader query text is empty.")
@@ -65,8 +66,9 @@ async def evaluate_needs(
         errors.append(exc)
     
     return {
+        "query_embedding": user_query_embedding,
         "search_target": primary_intent,
         "concepts_from_query": additional_concepts,
         "eval_resoning": reasoning,
-        "errors": errors
+        "errors": errors,
     }
