@@ -272,3 +272,5 @@ class Neo4jSettings(BaseSettings):
             f"{self.target} ({scheme}://…{host}, db={self.database}, "
             f"user={self.username}, creds={cred})"
         )
+
+ 

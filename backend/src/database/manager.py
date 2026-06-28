@@ -578,6 +578,42 @@ class DatabaseManager:
         """
         result = await self.query(cypher, {"embedding": embedding, "top_k": top_k})
         return result["data"]
+    
+    async def search_concept_nodes_parallel(
+        self,
+        labels: list[str],
+        embedding: list[float],
+        top_k: int,
+    ) -> list[dict[str, Any]]:
+        """Search concept nodes by vector similarity."""
+        if self._in_memory:
+            nodes = list(self._memory_nodes.get(label, {}).values())
+            ranked = []
+            for node in nodes:
+                similarity = self._cosine_similarity(embedding, node.get("embedding", []))
+                ranked.append(
+                    {
+                        "node_id": node["id"],
+                        "text": node["text"],
+                        "embedding": node.get("embedding", []),
+                        "similarity": similarity,
+                    }
+                )
+            ranked.sort(key=lambda item: item["similarity"], reverse=True)
+            return ranked[:top_k]
+
+        cypher = f"""
+        MATCH (n:{label})
+        WHERE n.embedding IS NOT NULL
+        RETURN elementId(n) AS node_id,
+               coalesce(n.text, '') AS text,
+               n.embedding AS embedding,
+               vector.similarity.cosine(n.embedding, $embedding) AS similarity
+        ORDER BY similarity DESC
+        LIMIT $top_k
+        """
+        result = await self.query(cypher, {"embedding": embedding, "top_k": top_k})
+        return result["data"]
 
     async def get_alternative_nodes(
         self,
