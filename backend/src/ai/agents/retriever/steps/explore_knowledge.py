@@ -5,7 +5,7 @@ from multiprocessing import Pool, TimeoutError
 
 from pydantic import BaseModel, ValidationError
 
-from src.ai.agents.retriever.retriever_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
+from src.ai.agents.retriever.models import AdvancedAgentContext, AdvancedReaderAgentState
 from src.ai.prompts import (
     EVALUATE_NEEDS_PROMPT,
     ENVIRONMENT_DEFINITION,
@@ -27,7 +27,7 @@ class ExplorationResultsFields(BaseModel):
 
 async def explore_knowledge(
     state: AdvancedReaderAgentState,
-    context: AdvancedReaderAgentContext
+    context: AdvancedAgentContext
 ):
     """ Evaluate the needs of the user based on the query and knowledge base.
     This function analyses the user's query for the target concept and the provided hints/context for relevant concepts.
@@ -68,7 +68,7 @@ async def explore_knowledge(
 
 async def concept_search_node(
     state: AdvancedReaderAgentState,
-    context: AdvancedReaderAgentContext
+    context: AdvancedAgentContext
 ) -> AdvancedReaderAgentState:
     target_similarity = 0.90
     adaptive_step = 10

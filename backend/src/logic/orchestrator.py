@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from src.ai.agents.retriever.advanced_retriever import build_advanced_retriever_graph
-from backend.src.ai.agents.retriever.retriever_states import AdvancedReaderAgentContext
+from backend.src.ai.agents.retriever.models import AdvancedAgentContext
 from src.ai.providers.abstract_provider import AbstractProviderLLMClient, AbstractProviderEmbedderClient
 from src.ai.retriever import build_retriever_graph
 from src.ai.submitter import build_submitter_graph
@@ -26,7 +26,7 @@ class AgentOrchestrator:
         embedder: AbstractProviderEmbedderClient,
         top_k: int,
     ) -> None:
-        self.context = AdvancedReaderAgentContext(
+        self.context = AdvancedAgentContext(
             db=db,
             llm=llm,
             embedder=embedder,

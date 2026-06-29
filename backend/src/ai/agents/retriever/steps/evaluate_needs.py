@@ -3,7 +3,7 @@ import logging
 
 from pydantic import BaseModel, ValidationError
 
-from src.ai.agents.retriever.retriever_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
+from src.ai.agents.retriever.models import AdvancedAgentContext, AdvancedReaderAgentState
 from src.ai.prompts import (
     EVALUATE_NEEDS_PROMPT,
     ENVIRONMENT_DEFINITION,
@@ -24,7 +24,7 @@ class EvalFields(BaseModel):
 
 async def evaluate_needs(
     state: AdvancedReaderAgentState,
-    context: AdvancedReaderAgentContext
+    context: AdvancedAgentContext
 ) -> dict[str, any]:
     """ Evaluate the needs of the user based on the query and knowledge base.
     This function analyses the user's query for the target concept and the provided hints/context for relevant concepts.

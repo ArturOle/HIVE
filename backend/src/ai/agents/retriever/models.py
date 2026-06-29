@@ -26,7 +26,7 @@ class AdvancedReaderAgentState(BaseModel):
     llm_response: str | None
 
 
-class AdvancedReaderAgentContext(BaseModel):
+class AdvancedAgentContext(BaseModel):
     """Context for the Advanced Reader Agent. """
     model_config = ConfigDict(arbitrary_types_allowed=True)
 

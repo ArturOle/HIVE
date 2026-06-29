@@ -3,7 +3,7 @@ import logging
 from langgraph.graph import END, START, StateGraph
 
 from src.ai.agents.retriever.steps import evaluate_needs
-from src.ai.agents.retriever.retriever_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
+from src.ai.agents.retriever.models import AdvancedReaderAgentContext, AdvancedReaderAgentState
 
 logger = logging.getLogger(__name__)
 
