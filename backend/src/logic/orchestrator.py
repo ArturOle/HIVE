@@ -15,7 +15,7 @@ from src.database.manager import DatabaseManager
 from dotenv import load_dotenv
 
 
-load_dotenv("/home/r2/Documents/Projects/ReLived/backend/.env")
+load_dotenv("/home/r2/Documents/Projects/HIVE/backend/.env")
 
 
 @dataclass(slots=True)

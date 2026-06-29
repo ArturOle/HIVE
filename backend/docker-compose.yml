@@ -4,7 +4,7 @@ services:
   neo4j:
     build: .
     image: neo4j:latest
-    container_name: relived-neo4j
+    container_name: hive-neo4j
     environment:
       # Auth - only essential setting
       NEO4J_AUTH: neo4j/password
@@ -22,7 +22,7 @@ services:
       - neo4j_import:/var/lib/neo4j/import
 
     networks:
-      - relived_network
+      - hive_network
 
     healthcheck:
       test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "password", "RETURN 1"]
@@ -34,13 +34,13 @@ services:
   # Optional: Add Bloom for visual graph exploration (requires Neo4j Enterprise or separate setup)
   # neo4j-bloom:
   #   image: gcr.io/neo4j-gke/neo4j-bloom:latest
-  #   container_name: relived-bloom
+  #   container_name: hive-bloom
   #   ports:
   #     - "7473:7473"
   #   depends_on:
   #     - neo4j
   #   networks:
-  #     - relived_network
+  #     - hive_network
 
 volumes:
   neo4j_data:
@@ -51,5 +51,5 @@ volumes:
     driver: local
 
 networks:
-  relived_network:
+  hive_network:
     driver: bridge

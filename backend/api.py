@@ -76,7 +76,7 @@ async def lifespan(app: FastAPI):
     logger.info("Orchestrator closed")
 
 
-app = FastAPI(lifespan=lifespan, title="ReLived Orchestrator API")
+app = FastAPI(lifespan=lifespan, title="HIVE Orchestrator API")
 
 # TODO: move to api/models
 class QueryRequest(BaseModel):

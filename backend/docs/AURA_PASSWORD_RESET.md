@@ -21,7 +21,7 @@ AuthError: The client is unauthorized due to authentication failure
 
 ### Step 2: Update `.env`
 
-Edit `ReLived/.env` and replace the password:
+Edit `HIVE/.env` and replace the password:
 
 ```env
 # Before (OLD - doesn't work):

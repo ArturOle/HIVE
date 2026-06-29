@@ -161,7 +161,7 @@ First embedding generation is slow because the model loads into memory. This is 
 
 For production: consider GPU for <50ms latency.
 
-## Integration with ReLived
+## Integration with HIVE
 
 ### In Orchestrator
 ```python
@@ -193,7 +193,7 @@ embedder = get_embedder_safe(primary_embedder=None, fallback_to_qwen=True)
 
 ## Directory Structure After Setup
 ```
-ReLived/
+HIVE/
 ├── models/
 │   └── qwen/
 │       ├── config.json

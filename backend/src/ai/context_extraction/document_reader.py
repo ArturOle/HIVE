@@ -10,5 +10,5 @@ def read_document(file_path: str) -> str:
 
 if __name__ == "__main__":
     # Example usage
-    content = read_document("/home/r2/Documents/Projects/ReLived/backend/data_cold/eu_gdpr.txt")  # Replace with your document path
+    content = read_document("/home/r2/Documents/Projects/HIVE/backend/data_cold/eu_gdpr.txt")  # Replace with your document path
     print(content)

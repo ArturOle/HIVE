@@ -1,12 +1,12 @@
-# Docker Setup Guide for ReLived
+# Docker Setup Guide for HIVE
 
-This guide explains how to use Docker Compose to run Neo4j with persistent storage for the ReLived knowledge base system.
+This guide explains how to use Docker Compose to run Neo4j with persistent storage for the HIVE knowledge base system.
 
 ## Quick Start
 
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop) (includes Docker and Docker Compose)
-- Python 3.14+ with the ReLived dependencies installed
+- Python 3.14+ with the HIVE dependencies installed
 
 ### Start Neo4j Database
 
@@ -71,7 +71,7 @@ driver = AsyncGraphDatabase.driver(
 ```
 
 ### Auto-Detection
-The ReLived system automatically detects Docker environment and connects to the appropriate host:
+The HIVE system automatically detects Docker environment and connects to the appropriate host:
 - **In Docker**: Uses `bolt://neo4j:7687`
 - **Locally**: Uses `bolt://localhost:7687`
 
@@ -146,10 +146,10 @@ docker-compose down -v
 ### Backup Database
 ```bash
 # Export database dump
-docker exec relived-neo4j neo4j-admin database dump neo4j --to-path=/var/lib/neo4j/dumps
+docker exec hive-neo4j neo4j-admin database dump neo4j --to-path=/var/lib/neo4j/dumps
 
 # Copy to host
-docker cp relived-neo4j:/var/lib/neo4j/dumps ./neo4j_backup
+docker cp hive-neo4j:/var/lib/neo4j/dumps ./neo4j_backup
 ```
 
 ## Management Commands
@@ -160,7 +160,7 @@ docker cp relived-neo4j:/var/lib/neo4j/dumps ./neo4j_backup
 # http://localhost:7474
 
 # Query with cypher-shell
-docker exec -it relived-neo4j cypher-shell -u neo4j -p password
+docker exec -it hive-neo4j cypher-shell -u neo4j -p password
 ```
 
 ### Health Check

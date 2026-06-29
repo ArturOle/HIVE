@@ -1,6 +1,6 @@
 # Hosted Neo4j (Aura) Setup Guide
 
-This guide walks you through using **Neo4j Aura** (managed cloud service) with ReLived.
+This guide walks you through using **Neo4j Aura** (managed cloud service) with HIVE.
 
 ## Why Hosted Neo4j?
 
@@ -18,7 +18,7 @@ This guide walks you through using **Neo4j Aura** (managed cloud service) with R
 2. Click "Start Free"
 3. Sign up or log in
 4. Create a new instance:
-   - **Name**: `relived-prod` (or any name)
+   - **Name**: `hive-prod` (or any name)
    - **Type**: Free (recommended to start)
    - **Region**: Choose closest to you
 5. Click "Create"
@@ -30,7 +30,7 @@ This guide walks you through using **Neo4j Aura** (managed cloud service) with R
 
 ---
 
-## Step 2: Configure ReLived
+## Step 2: Configure HIVE
 
 ### Create `.env` file in project root:
 
@@ -68,7 +68,7 @@ cat .env | grep NEO4J_
 
 ---
 
-## Step 3: Start ReLived with Docker
+## Step 3: Start HIVE with Docker
 
 ### Option A: Docker Compose (Simplest)
 
@@ -225,7 +225,7 @@ docker-compose up
 2. Click your instance
 3. Go to "Details" → "Manage Password"
 4. Update `.env` with new password
-5. Restart ReLived
+5. Restart HIVE
 
 ### 4. Use Network Controls (Pro Plan)
 
@@ -386,7 +386,7 @@ Check slow queries in Aura dashboard:
 ## Support
 
 - **Aura Issues**: https://support.neo4j.com
-- **ReLived Issues**: Check [QUICKSTART.md](../QUICKSTART.md)
+- **HIVE Issues**: Check [QUICKSTART.md](../QUICKSTART.md)
 - **Neo4j Docs**: https://neo4j.com/docs/aura/
 
 ---
@@ -401,7 +401,7 @@ Check slow queries in Aura dashboard:
 | **Professional** | Unlimited | From $99/mo | Production |
 | **Enterprise** | Unlimited | Custom | Large scale |
 
-For ReLived's typical use case:
+For HIVE's typical use case:
 - **Small knowledge base** (< 100k nodes) → Free tier
 - **Medium** (100k-1M nodes) → Professional $99/mo
 - **Large** (> 1M nodes) → Enterprise plan

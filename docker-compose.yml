@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: dockerfile
-    container_name: relived-backend
+    container_name: hive-backend
     
     # ─── GPU ALLOCATION ──────────────────────────────────────────────────
     deploy:
@@ -46,7 +46,7 @@ services:
       - "8000:8000"
     
     networks:
-      - relived_network
+      - hive_network
     
     command: uvicorn api:app --host 0.0.0.0 --port 8000
     
@@ -67,7 +67,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: relived-frontend
+    container_name: hive-frontend
     environment:
       BACKEND_URL: http://backend_api:8000
     
@@ -79,7 +79,7 @@ services:
         condition: service_healthy
     
     networks:
-      - relived_network
+      - hive_network
     
     command: streamlit run src/main.py --server.port 8501 --server.address 0.0.0.0
     
@@ -89,7 +89,7 @@ services:
   # Optional: Local Neo4j for development (set NEO4J_TARGET=local to use)
   neo4j:
     image: neo4j:5.15-community
-    container_name: relived-neo4j
+    container_name: hive-neo4j
     environment:
       NEO4J_AUTH: neo4j/password
       NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes"
@@ -100,7 +100,7 @@ services:
       - neo4j_data:/var/lib/neo4j/data
       - neo4j_logs:/var/lib/neo4j/logs
     networks:
-      - relived_network
+      - hive_network
     healthcheck:
       test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "password", "RETURN 1"]
       interval: 10s
@@ -116,5 +116,5 @@ volumes:
   qwen_model_cache:   # Declared the named persistent volume for your Qwen models
 
 networks:
-  relived_network:
+  hive_network:
     driver: bridge
