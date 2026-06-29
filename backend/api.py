@@ -16,10 +16,10 @@ from src.database.manager import DatabaseManager
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
-# Global orchestrator instance
+# Global orchestrator instance TODO: make it as singleton
 orchestrator: AgentOrchestrator | None = None
 
-
+# TODO: Probably this should not be here 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage orchestrator lifecycle."""
@@ -78,7 +78,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, title="ReLived Orchestrator API")
 
-
+# TODO: move to api/models
 class QueryRequest(BaseModel):
     """Read query request."""
     query: str
@@ -101,7 +101,7 @@ async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "ok"}
 
-
+# TODO: Move to the api/routes
 @app.api_route("/read", methods=["GET", "POST"])
 async def read(request: QueryRequest | None = None, query: str | None = None, top_k: int | None = None) -> QueryResponse:
     """Execute read workflow."""

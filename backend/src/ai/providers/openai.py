@@ -10,23 +10,6 @@ from src.ai.providers.abstract_provider import (
 )
 
 
-# class OpenAIProviderConfig(AbstractProviderConfig):
-#     """Configuration for OpenAI provider clients."""
-
-#     api_key: str
-#     llm_model: str = "gpt-4o-mini"
-#     embedding_model: str = "text-embedding-3-small"
-
-#     @classmethod
-#     def from_env(cls) -> "OpenAIProviderConfig":
-#         api_key = os.getenv("OPENAI_API_KEY", "").strip()
-#         if not api_key:
-#             raise RuntimeError("OPENAI_API_KEY is not set")
-#         return cls(
-#             api_key=api_key,
-#             llm_model=os.getenv("OPENAI_LLM_MODEL", "gpt-4o-mini"),
-#             embedding_model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
-#         )
 class OpenAIProviderConfig(BaseSettings):
     """Configuration for Gemini provider clients using Pydantic."""
 

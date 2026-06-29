@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
-from dataclasses import dataclass
 from typing import Any, Protocol, TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -89,37 +87,13 @@ class WriterState(TypedDict, total=False):
     errors: list[str]
 
 
-@dataclass(slots=True)
-class DeterministicEmbedder:
-    """Fallback deterministic embedder for local/dev execution."""
-
-    dimensions: int = 32
-
-    async def embed(self, text: str) -> list[float]:
-        digest = hashlib.sha256(text.encode("utf-8")).digest()
-        values = [digest[i % len(digest)] / 255.0 for i in range(self.dimensions)]
-        return values
-
-
-def _extract_json_object(raw: str) -> dict[str, Any]:
-    """Extract first JSON object from model output."""
-    try:
-        return json.loads(raw)
-    except json.JSONDecodeError:
-        start = raw.find("{")
-        end = raw.rfind("}")
-        if start == -1 or end == -1 or end <= start:
-            raise ValueError("Model output does not contain valid JSON object")
-        return json.loads(raw[start : end + 1])
-
-
 def build_writer_graph(
     db: DatabaseManager,
     llm: LLMClient | None = None,
     embedder: EmbedderClient | None = None,
 ):
     """Build and compile writer graph."""
-    embedder_client = embedder or DeterministicEmbedder()
+    embedder_client = embedder
 
     async def discovery_node(state: WriterState) -> WriterState:
         text = state.get("text", "").strip()

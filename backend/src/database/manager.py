@@ -11,7 +11,7 @@ Example:
     >>> report = await db.get_report()
     >>> await db.close()
 """
-
+# TODO: to be refactored and recomposed. AI gone rouge
 from typing import Any, Optional
 import logging
 import math
