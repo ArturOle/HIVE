@@ -1,15 +1,13 @@
 """Orchestrator for routing read/write LangGraph workflows."""
-# TODO: looks messy, refactor needed
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
-from src.ai.agents.reader.advanced_reader import build_advanced_reader_graph
-from src.ai.agents.reader.reader_states import AdvancedReaderAgentContext
+from src.ai.agents.retriever.advanced_retriever import build_advanced_retriever_graph
+from backend.src.ai.agents.retriever.retriever_states import AdvancedReaderAgentContext
 from src.ai.providers.abstract_provider import AbstractProviderLLMClient, AbstractProviderEmbedderClient
-from src.ai.reader import build_reader_graph
-from src.ai.writer import build_writer_graph
+from src.ai.retriever import build_retriever_graph
+from src.ai.submitter import build_submitter_graph
 from src.database.manager import DatabaseManager
 
 from dotenv import load_dotenv
@@ -18,33 +16,24 @@ from dotenv import load_dotenv
 load_dotenv("/home/r2/Documents/Projects/HIVE/backend/.env")
 
 
-@dataclass(slots=True)
-class OrchestratorConfig:
-    """Execution config for read/write routing."""
-    default_top_k: int | None = None
-
-
 class AgentOrchestrator:
-    """Coordinates shared resources and two specialized LangGraph workflows."""
+    """Coordinates shared resources and specialized LangGraph workflows."""
 
     def __init__(
         self,
         db: DatabaseManager,
         llm: AbstractProviderLLMClient,
         embedder: AbstractProviderEmbedderClient,
-        config: OrchestratorConfig | None = None,
+        top_k: int,
     ) -> None:
         self.context = AdvancedReaderAgentContext(
             db=db,
             llm=llm,
             embedder=embedder,
         )
-        self.db = db
-        self.embedder = embedder
-        self.llm = llm
-        self.config = config or OrchestratorConfig()
-        self.writer_graph = None
-        self.reader_graph = None
+        self.top_k = top_k
+        self.submit_graph = None
+        self.retrieve_graph = None
         self._initialized = False
 
     async def initialize(self) -> None:
@@ -52,31 +41,31 @@ class AgentOrchestrator:
         if self._initialized:
             return
 
-        await self.db.initialize()
-        await self.db.setup_database()
+        await self.context.db.initialize()
+        await self.context.db.setup_database()
 
-        self.writer_graph = build_writer_graph(
+        self.submit_graph = build_submitter_graph(
             db=self.context.db,
             llm=self.context.llm,
             embedder=self.context.embedder,
         )
-        self.reader_graph = build_reader_graph(
+        self.retrieve_graph = build_retriever_graph(
             db=self.context.db,
             llm=self.context.llm,
             embedder=self.context.embedder,
         )
-        # self.advanced_reader_graph = build_advanced_reader_graph(
-        #     context=self.context
-        # )
+        self.advanced_retrieve_graph = build_advanced_retriever_graph(
+            context=self.context
+        )
 
         self._initialized = True
 
-    async def run_write(self, text: str, environment_hint: str = "") -> dict[str, Any]:
-        """Execute writer workflow."""
-        if not self.writer_graph:
+    async def run_submit(self, text: str, environment_hint: str = "") -> dict[str, Any]:
+        """Execute submit workflow."""
+        if not self.submit:
             raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
 
-        result = await self.writer_graph.ainvoke(
+        result = await self.submit_graph.ainvoke(
             {
                 "text": text,
                 "environment_hint": environment_hint,
@@ -85,14 +74,27 @@ class AgentOrchestrator:
         )
         return dict(result)
 
-    async def run_read(self, query: str, top_k: int | None = None) -> dict[str, Any]:
+    async def run_retrieve(self, query: str, top_k: int | None = None) -> dict[str, Any]:
         """Execute reader workflow."""
-        if not self.reader_graph:
+        if not self.retrieve_graph:
             raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
-        result = await self.reader_graph.ainvoke(
+        result = await self.retrieve_graph.ainvoke(
             {
                 "query": query,
-                "top_k": top_k if top_k is not None else self.config.default_top_k,
+                "top_k": top_k if top_k is not None else self.top_k,
+                "errors": [],
+            }
+        )
+        return dict(result)
+
+    async def run_advanced_retrieve(self, query: str, top_k: int | None = None) -> dict[str, Any]:
+        """Execute advanced retriever workflow."""
+        if not self.advanced_retrieve_graph:
+            raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
+        result = await self.advanced_retrieve_graph.ainvoke(
+            {
+                "query": query,
+                "top_k": top_k if top_k is not None else self.top_k,
                 "errors": [],
             }
         )
@@ -105,23 +107,21 @@ class AgentOrchestrator:
         environment_hint: str = "general",
         top_k: int | None = None,
     ) -> dict[str, Any]:
-        """Route execution to dedicated read or write graph."""
+        """Route execution to dedicated retrieve or submit graph."""
 
         match mode.strip().lower():
-            case "write":
-                return await self.run_write(text=text, environment_hint=environment_hint)
-            case "read":
-                return await self.run_read(query=text, top_k=top_k)
-            case "advanced_read":
-                if not self.advanced_reader_graph:
-                    raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
-                return await self.run_advanced_read(query=text, top_k=top_k)
+            case "submit":
+                return await self.run_submit(text=text, environment_hint=environment_hint)
+            case "retrieve":
+                return await self.run_retrieve(query=text, top_k=top_k)
+            case "advanced_retrieve":
+                return await self.run_advanced_retrieve(query=text, top_k=top_k)
             case _:
-                raise ValueError("mode must be either 'read' or 'write'")
+                raise ValueError("Mode must be either 'advanced_retrieve', 'retrieve' or 'submit'.")
 
     async def close(self) -> None:
         """Release orchestrator resources."""
-        await self.db.close()
+        await self.context.db.close()
         self._initialized = False
 
     async def __aenter__(self) -> "AgentOrchestrator":

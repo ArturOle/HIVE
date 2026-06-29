@@ -99,7 +99,7 @@ def _cosine_similarity(a: list[float], b: list[float]) -> float:
     return dot / (norm_a * norm_b)
 
 
-def build_reader_graph(
+def build_retriever_graph(
     db: DatabaseManager,
     llm: LLMClient,
     embedder: EmbedderClient,

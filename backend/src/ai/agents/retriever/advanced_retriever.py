@@ -2,13 +2,13 @@ import logging
 
 from langgraph.graph import END, START, StateGraph
 
-from src.ai.agents.reader.steps import evaluate_needs
-from src.ai.agents.reader.reader_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
+from src.ai.agents.retriever.steps import evaluate_needs
+from src.ai.agents.retriever.retriever_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
 
 logger = logging.getLogger(__name__)
 
 
-def build_advanced_reader_graph(
+def build_advanced_retriever_graph(
     context: AdvancedReaderAgentContext
 ) -> StateGraph:
     target_similarity = 0.90
@@ -17,7 +17,7 @@ def build_advanced_reader_graph(
 
     """Build and compile reader graph."""
  
-    async def security_checks_step(state: AdvancedReaderAgentState):
+    async def security_checks_step(state: AdvancedReaderAgentState, context: AdvancedReaderAgentContext) -> AdvancedReaderAgentState:
         """Check the user prompt for jailbrake, prompt injection, sql injection"""
         try:
             state = await evaluate_needs(state, context)
@@ -59,7 +59,7 @@ def build_advanced_reader_graph(
         state_schema=AdvancedReaderAgentState,
         context_schema=AdvancedReaderAgentContext,
     )
-    graph.add_node("security_checks", security_checks_step)
+    # TODO: <maybe not here but still> graph.add_node("security_checks", security_checks_step)
     graph.add_node("evaluate_needs", evaluate_needs_step)
     graph.add_node("explore_knowledge_base", explore_knowledge_base_step)
     graph.add_node("write_response", write_response_step)

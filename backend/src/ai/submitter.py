@@ -87,7 +87,7 @@ class WriterState(TypedDict, total=False):
     errors: list[str]
 
 
-def build_writer_graph(
+def build_submitter_graph(
     db: DatabaseManager,
     llm: LLMClient | None = None,
     embedder: EmbedderClient | None = None,
