@@ -18,7 +18,7 @@ import math
 import time
 import uuid
 
-from src.database.config import Neo4jSettings
+from src.database.config import Neo4jSettings, load_cypher
 from src.database.infrastructure.driver import Neo4jDriver
 from src.database.infrastructure.repository import Neo4jRepository
 from src.database.infrastructure.schema import SchemaManager
@@ -550,6 +550,8 @@ class DatabaseManager:
         top_k: int,
     ) -> list[dict[str, Any]]:
         """Search concept nodes by vector similarity."""
+        
+        # cypher = load_cypher()
         if self._in_memory:
             nodes = list(self._memory_nodes.get(label, {}).values())
             ranked = []
@@ -586,6 +588,7 @@ class DatabaseManager:
         top_k: int,
     ) -> list[dict[str, Any]]:
         """Search concept nodes by vector similarity."""
+        cypher = load_cypher("node_exploration/cross_branch")
         if self._in_memory:
             nodes = list(self._memory_nodes.get(label, {}).values())
             ranked = []
@@ -602,17 +605,6 @@ class DatabaseManager:
             ranked.sort(key=lambda item: item["similarity"], reverse=True)
             return ranked[:top_k]
 
-        cypher = f"""
-        MATCH (n:{label})
-        WHERE n.embedding IS NOT NULL
-        RETURN elementId(n) AS node_id,
-               coalesce(n.text, '') AS text,
-               n.embedding AS embedding,
-               vector.similarity.cosine(n.embedding, $embedding) AS similarity
-        ORDER BY similarity DESC
-        LIMIT $top_k
-        """
-        result = await self.query(cypher, {"embedding": embedding, "top_k": top_k})
         return result["data"]
 
     async def get_alternative_nodes(

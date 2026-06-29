@@ -3,8 +3,8 @@ import logging
 
 from pydantic import BaseModel, ValidationError
 
-from backend.src.ai.agents.reader.reader_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
-from backend.src.ai.prompts import (
+from src.ai.agents.reader.reader_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
+from src.ai.prompts import (
     EVALUATE_NEEDS_PROMPT,
     ENVIRONMENT_DEFINITION,
     PROBLEM_DEFINITION,

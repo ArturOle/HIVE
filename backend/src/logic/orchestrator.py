@@ -5,8 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from backend.src.ai.agents.reader.advanced_reader import build_advanced_reader_graph
-from backend.src.ai.agents.reader.reader_states import AdvancedReaderAgentContext
+from src.ai.agents.reader.advanced_reader import build_advanced_reader_graph
+from src.ai.agents.reader.reader_states import AdvancedReaderAgentContext
+from src.ai.providers.abstract_provider import AbstractProviderLLMClient, AbstractProviderEmbedderClient
 from src.ai.reader import build_reader_graph
 from src.ai.writer import build_writer_graph
 from src.database.manager import DatabaseManager
@@ -28,16 +29,19 @@ class AgentOrchestrator:
 
     def __init__(
         self,
-        db: DatabaseManager | None = None,
-        llm: Any | None = None,
-        embedder: Any | None = None,
+        db: DatabaseManager,
+        llm: AbstractProviderLLMClient,
+        embedder: AbstractProviderEmbedderClient,
         config: OrchestratorConfig | None = None,
     ) -> None:
         self.context = AdvancedReaderAgentContext(
-            db=db or DatabaseManager(),
+            db=db,
             llm=llm,
             embedder=embedder,
         )
+        self.db = db
+        self.embedder = embedder
+        self.llm = llm
         self.config = config or OrchestratorConfig()
         self.writer_graph = None
         self.reader_graph = None
@@ -61,9 +65,9 @@ class AgentOrchestrator:
             llm=self.context.llm,
             embedder=self.context.embedder,
         )
-        self.advanced_reader_graph = build_advanced_reader_graph(
-            context=self.context
-        )
+        # self.advanced_reader_graph = build_advanced_reader_graph(
+        #     context=self.context
+        # )
 
         self._initialized = True
 

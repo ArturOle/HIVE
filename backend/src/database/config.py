@@ -30,6 +30,7 @@ Neo4jTarget = Literal["local", "hosted", "docker"]
 # Project root (ReLived/) — stable .env path regardless of Jupyter cwd
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 _ENV_FILE = _PROJECT_ROOT / ".env"
+QUERY_DIR = Path(__file__).parent / "cyphers"
 
 
 class Neo4jTargetMode(str, Enum):
@@ -54,6 +55,10 @@ def load_project_env(*, override: bool = False) -> Path | None:
         return _ENV_FILE
     return None
 
+ 
+def load_cypher(name: str) -> str:
+    """Load a .cypher file once at import time, not on every call."""
+    return (QUERY_DIR / f"{name}.cypher").read_text()
 
 # Ensure hosted/local credentials from .env are available before Settings loads
 load_project_env(override=False)

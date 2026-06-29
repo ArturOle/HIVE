@@ -5,8 +5,8 @@ from multiprocessing import Pool, TimeoutError
 
 from pydantic import BaseModel, ValidationError
 
-from backend.src.ai.agents.reader.reader_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
-from backend.src.ai.prompts import (
+from src.ai.agents.reader.reader_states import AdvancedReaderAgentContext, AdvancedReaderAgentState
+from src.ai.prompts import (
     EVALUATE_NEEDS_PROMPT,
     ENVIRONMENT_DEFINITION,
     PROBLEM_DEFINITION,
@@ -14,7 +14,7 @@ from backend.src.ai.prompts import (
     MECHANISM_DEFINITION,
     RESULT_DEFINITION,
 )
-from backend.src.database.manager import DatabaseManager
+from src.database.manager import DatabaseManager
 
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ async def explore_knowledge(
     """ Evaluate the needs of the user based on the query and knowledge base.
     This function analyses the user's query for the target concept and the provided hints/context for relevant concepts.
     
-    Arguments:
+    Args:
         state: Holds changing state of the graph
         context: Holds references to system objects
     
@@ -56,22 +56,83 @@ async def explore_knowledge(
     concepts_from_query = state.get("concepts_from_query", "").strip()
     suppl_ctx_srch_res = {}
     if concepts_from_query:
-        with Pool(processes=4) as pool:
-            # 2. run the simillarity search based on the additional concepts provided in query (from most important)
-            suppl_ctx_srch_res = {
-                concept: pool.apply_async(
-                    func=context.db.search_concept_nodes,
-                    kwargs={
-                        "label": concept.capitalize(),
-                        "embedding": query_embedding,
-                        "top_k": top_k,
-                    }
-                ) for concept in concepts_from_query
-            }
-    # 3. Merge results
+        # 2. run the simillarity search based on the additional concepts provided in query (from most important)
+        # 3. Merge results
+        # 4 for the results of step 2, explore for target
+        # 5. join results and save
+        suppl_ctx_srch_res = context.db.search_concept_nodes_parallel(
+            labels=concepts_from_query,
+            embedding=query_embedding,
+            top_k=top_k
+        )
 
-    # 4 for the results of step 2, explore for target
+async def concept_search_node(
+    state: AdvancedReaderAgentState,
+    context: AdvancedReaderAgentContext
+) -> AdvancedReaderAgentState:
+    target_similarity = 0.90
+    adaptive_step = 10
+    adaptive_cap = 120
+    concept_labels = {
+        "environment": "Environment",
+        "problem": "Problem",
+        "solution": "Solution",
+        "mechanism": "Mechanism",
+        "result": "Result",
+    }
+    concepts_raw = state.get("concepts", {})
+    errors = list(state.get("errors", []))
+    requested_top_k = state.get("top_k")
+    concept_embeddings: dict[str, list[float]] = {}
+    concept_hits: dict[str, list[dict[str, any]]] = {}
 
-    # 5. join results and save
+    for concept, label in concept_labels.items():
+        value = concepts_raw.get(concept)
+        if not value:
+            continue
 
+        query_embedding = await context.embedder.embed(value)
+        concept_embeddings[concept] = query_embedding
 
+        effective_limit = int(requested_top_k) if requested_top_k else adaptive_step
+        rows: list[dict[str, any]] = []
+        while True:
+            try:
+                rows = await context.db.search_concept_nodes(
+                    label=label,
+                    embedding=query_embedding,
+                    top_k=effective_limit,
+                )
+            except Exception as exc:  # pragma: no cover - depends on Neo4j capabilities
+                logger.warning(
+                    "Vector similarity query failed for %s, using fallback ranking: %s",
+                    concept,
+                    exc,
+                )
+                fallback = await context.db.search_concept_nodes(
+                    label=label,
+                    embedding=query_embedding,
+                    top_k=300,
+                )
+                rows = []
+                for row in fallback:
+                    similarity = _cosine_similarity(query_embedding, row.get("embedding", []))
+                    rows.append({**row, "similarity": similarity})
+                rows.sort(key=lambda r: float(r.get("similarity", 0.0)), reverse=True)
+                rows = rows[:effective_limit]
+
+            if requested_top_k:
+                break
+
+            best_similarity = float(rows[0].get("similarity", 0.0)) if rows else 0.0
+            if best_similarity >= target_similarity or effective_limit >= adaptive_cap:
+                break
+            effective_limit = min(effective_limit + adaptive_step, adaptive_cap)
+
+        concept_hits[concept] = rows
+
+    return {
+        "concept_embeddings": concept_embeddings,
+        "concept_hits": concept_hits,
+        "errors": errors,
+    }
