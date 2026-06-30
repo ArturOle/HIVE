@@ -2,14 +2,14 @@ import logging
 
 from langgraph.graph import END, START, StateGraph
 
-from src.ai.agents.retriever.steps import evaluate_needs
-from src.ai.agents.retriever.models import AdvancedReaderAgentContext, AdvancedReaderAgentState
+from ai.agents.retriever.steps import evaluate_needs
+from ai.agents.retriever.models import AdvancedAgentContext, AdvancedReaderAgentState
 
 logger = logging.getLogger(__name__)
 
 
 def build_advanced_retriever_graph(
-    context: AdvancedReaderAgentContext
+    context: AdvancedAgentContext
 ) -> StateGraph:
     target_similarity = 0.90
     adaptive_step = 10
@@ -17,7 +17,7 @@ def build_advanced_retriever_graph(
 
     """Build and compile reader graph."""
  
-    async def security_checks_step(state: AdvancedReaderAgentState, context: AdvancedReaderAgentContext) -> AdvancedReaderAgentState:
+    async def security_checks_step(state: AdvancedReaderAgentState, context: AdvancedAgentContext) -> AdvancedReaderAgentState:
         """Check the user prompt for jailbrake, prompt injection, sql injection"""
         try:
             state = await evaluate_needs(state, context)
@@ -26,7 +26,7 @@ def build_advanced_retriever_graph(
             state.errors.append(str(e))
         return state
 
-    async def evaluate_needs_step(state: AdvancedReaderAgentState, context: AdvancedReaderAgentContext) -> AdvancedReaderAgentState:
+    async def evaluate_needs_step(state: AdvancedReaderAgentState, context: AdvancedAgentContext) -> AdvancedReaderAgentState:
         """Evaluate the needs of the user based on the query and knowledge base."""
         try:
             state = await evaluate_needs(state, context)

@@ -3,12 +3,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.ai.agents.retriever.advanced_retriever import build_advanced_retriever_graph
-from backend.src.ai.agents.retriever.models import AdvancedAgentContext
-from src.ai.providers.abstract_provider import AbstractProviderLLMClient, AbstractProviderEmbedderClient
-from src.ai.retriever import build_retriever_graph
-from src.ai.submitter import build_submitter_graph
-from src.database.manager import DatabaseManager
+from ai.agents.retriever.advanced_retriever import build_advanced_retriever_graph
+from ai.agents.retriever.models import AdvancedAgentContext
+from ai.providers.abstract_provider import AbstractProviderLLMClient, AbstractProviderEmbedderClient
+from ai.retriever import build_retriever_graph
+from ai.submitter import build_submitter_graph
+from database.manager import DatabaseManager
 
 from dotenv import load_dotenv
 
@@ -34,6 +34,7 @@ class AgentOrchestrator:
         self.top_k = top_k
         self.submit_graph = None
         self.retrieve_graph = None
+        self.advanced_retrieve_graph = None
         self._initialized = False
 
     async def initialize(self) -> None:
@@ -62,7 +63,7 @@ class AgentOrchestrator:
 
     async def run_submit(self, text: str, environment_hint: str = "") -> dict[str, Any]:
         """Execute submit workflow."""
-        if not self.submit:
+        if not self.submit_graph:
             raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
 
         result = await self.submit_graph.ainvoke(

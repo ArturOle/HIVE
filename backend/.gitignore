@@ -7,3 +7,6 @@ models/qwen/*
 data/*
 data_cold/*
 .python-version
+.pytest_cache
+*.egg-info
+dist/

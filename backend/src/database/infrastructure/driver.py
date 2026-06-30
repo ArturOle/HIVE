@@ -11,7 +11,7 @@ from typing import Optional
 from neo4j import AsyncDriver, AsyncGraphDatabase, AsyncSession
 from neo4j.exceptions import AuthError, ServiceUnavailable, DriverError
 
-from src.database.config import Neo4jSettings
+from database.config import Neo4jSettings
 
 logger = logging.getLogger(__name__)
 

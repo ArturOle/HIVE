@@ -8,7 +8,7 @@ from typing import Any, Protocol
 
 from langgraph.graph import END, START, StateGraph
 
-from src.ai.prompts import (
+from backend.src.ai.prompts import (
     PROBLEM_DEFINITION,
     RESULT_DEFINITION,
     SOLUTION_DEFINITION,
@@ -16,8 +16,8 @@ from src.ai.prompts import (
     WRITER_DISCOVERY_PROMPT,
     WRITER_REFLECTION_PROMPT,
 )
-from src.database.manager import DatabaseManager
-from src.ai.agents.submitter.models import WriterExtraction, WriterReflection, WriterState
+from backend.src.database.manager import DatabaseManager
+from backend.src.ai.agents.submitter.models import WriterExtraction, WriterReflection, WriterState
 
 logger = logging.getLogger(__name__)
 

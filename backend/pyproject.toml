@@ -3,7 +3,7 @@ name = "hive-backend"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "ArturOle",email = "artur.oleksiski99@gmail.com"}
+    {name = "ArturOle", email = "artur.oleksiski99@gmail.com"}
 ]
 requires-python = ">=3.13,<4.0.0"
 dependencies = [
@@ -25,6 +25,18 @@ dependencies = [
     "torch>=2.0.0",
 ]
 
+[tool.poetry]
+# W Poetry 2.0+ dedykowane opcje konfiguracji budowania nadal trafiają do [tool.poetry]
+packages = [
+    { include = "src", from = "." }
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

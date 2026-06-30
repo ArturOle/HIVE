@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import os
 from dataclasses import dataclass
-from src.ai.providers.abstract_provider import (
+from ai.providers.abstract_provider import (
     AbstractProviderLLMClient,
     AbstractProviderEmbedderClient,
 )

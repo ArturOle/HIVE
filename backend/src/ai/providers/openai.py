@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from src.ai.providers.abstract_provider import (
+from ai.providers.abstract_provider import (
     AbstractProviderLLMClient,
     AbstractProviderEmbedderClient,
 )

@@ -9,7 +9,7 @@ from typing import Any, Protocol, TypedDict
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field, field_validator
 
-from src.ai.prompts import (
+from ai.prompts import (
     PROBLEM_DEFINITION,
     RESULT_DEFINITION,
     SOLUTION_DEFINITION,
@@ -17,7 +17,7 @@ from src.ai.prompts import (
     WRITER_DISCOVERY_PROMPT,
     WRITER_REFLECTION_PROMPT,
 )
-from src.database.manager import DatabaseManager
+from database.manager import DatabaseManager
 
 logger = logging.getLogger(__name__)
 

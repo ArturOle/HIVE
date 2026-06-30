@@ -10,12 +10,12 @@ from typing import Any
 
 from neo4j import AsyncSession
 
-from src.database.domain.models import QueryResult
-from src.database.domain.repositories import (
+from database.domain.models import QueryResult
+from database.domain.repositories import (
     NodeRepository,
     RelationshipRepository,
 )
-from src.database.infrastructure.driver import Neo4jDriver
+from database.infrastructure.driver import Neo4jDriver
 
 logger = logging.getLogger(__name__)
 

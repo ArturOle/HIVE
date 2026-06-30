@@ -3,9 +3,9 @@ import operator
 from typing import Annotated
 from pydantic import BaseModel, Field, ConfigDict, SkipValidation
 
-from src.ai.models import Concept
-from src.database.manager import DatabaseManager
-from src.ai.providers.abstract_provider import AbstractProviderLLMClient, AbstractProviderEmbedderClient
+from ai.models import Concept
+from database.manager import DatabaseManager
+from ai.providers.abstract_provider import AbstractProviderLLMClient, AbstractProviderEmbedderClient
 
 
 class AdvancedReaderAgentState(BaseModel):

@@ -7,9 +7,9 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from src.database.domain.models import DatabaseStats
-from src.database.infrastructure.driver import Neo4jDriver
-from src.database.infrastructure.repository import Neo4jRepository
+from database.domain.models import DatabaseStats
+from database.infrastructure.driver import Neo4jDriver
+from database.infrastructure.repository import Neo4jRepository
 
 logger = logging.getLogger(__name__)
 

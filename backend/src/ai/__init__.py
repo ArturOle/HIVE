@@ -1,6 +1,6 @@
 """AI module public interfaces."""
 
-from src.ai.providers import (
+from ai.providers import (
     GeminiEmbedderClient,
     GeminiLLMClient,
     GeminiProviderConfig,
@@ -8,8 +8,8 @@ from src.ai.providers import (
     OpenAILLMClient,
     OpenAIProviderConfig,
 )
-from src.ai.retriever import build_retriever_graph
-from src.ai.submitter import build_submitter_graph
+from ai.retriever import build_retriever_graph
+from ai.submitter import build_submitter_graph
 
 __all__ = [
     "OpenAIProviderConfig",

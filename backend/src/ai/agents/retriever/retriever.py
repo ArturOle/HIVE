@@ -11,8 +11,8 @@ from typing import Any, Protocol, TypedDict
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, ValidationError
 
-from src.ai.prompts import COMPOSE_RESPONSE_PROMPT, READER_CONCEPT_PARSE_PROMPT
-from src.database.manager import DatabaseManager
+from ai.prompts import COMPOSE_RESPONSE_PROMPT, READER_CONCEPT_PARSE_PROMPT
+from database.manager import DatabaseManager
 
 logger = logging.getLogger(__name__)
 

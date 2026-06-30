@@ -18,11 +18,11 @@ import math
 import time
 import uuid
 
-from src.database.config import Neo4jSettings, load_cypher
-from src.database.infrastructure.driver import Neo4jDriver
-from src.database.infrastructure.repository import Neo4jRepository
-from src.database.infrastructure.schema import SchemaManager
-from src.database.infrastructure.reporting import ReportingService
+from database.config import Neo4jSettings, load_cypher
+from database.infrastructure.driver import Neo4jDriver
+from database.infrastructure.repository import Neo4jRepository
+from database.infrastructure.schema import SchemaManager
+from database.infrastructure.reporting import ReportingService
 
 logger = logging.getLogger(__name__)
 

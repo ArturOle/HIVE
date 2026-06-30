@@ -6,7 +6,7 @@ and destructive operations like drop and recreate.
 
 import logging
 
-from src.database.infrastructure.driver import Neo4jDriver
+from database.infrastructure.driver import Neo4jDriver
 
 logger = logging.getLogger(__name__)
 
