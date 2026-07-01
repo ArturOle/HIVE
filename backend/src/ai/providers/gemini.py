@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import os
 from dataclasses import dataclass
+from langfuse import observe
+
 from ai.providers.abstract_provider import (
     AbstractProviderLLMClient,
     AbstractProviderEmbedderClient,
@@ -46,6 +48,7 @@ class GeminiLLMClient(AbstractProviderLLMClient):
         self._genai = genai
         self._model = config.llm_model
 
+    @observe(as_type="generation")
     async def ainvoke(self, prompt: str) -> str:
         model = self._genai.GenerativeModel(self._model)
         response = await asyncio.to_thread(model.generate_content, prompt)
@@ -67,6 +70,7 @@ class GeminiEmbedderClient(AbstractProviderEmbedderClient):
         self._genai = genai
         self._model = config.embedding_model
 
+    @observe(as_type="generation")
     async def embed(self, text: str) -> list[float]:
         response = await asyncio.to_thread(
             self._genai.embed_content,
