@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from langfuse import observe
+
 from ai.providers.abstract_provider import (
     AbstractProviderLLMClient,
     AbstractProviderEmbedderClient,
@@ -49,6 +51,7 @@ class OpenAILLMClient(AbstractProviderLLMClient):
         self._client = AsyncOpenAI(api_key=config.api_key)
         self._model = config.llm_model
 
+    @observe(as_type="generation")
     async def ainvoke(self, prompt: str) -> str:
         response = await self._client.responses.create(
             model=self._model,
@@ -71,6 +74,7 @@ class OpenAIEmbedderClient(AbstractProviderEmbedderClient):
         self._client = AsyncOpenAI(api_key=config.api_key)
         self._model = config.embedding_model
 
+    @observe(as_type="generation")
     async def embed(self, text: str) -> list[float]:
         response = await self._client.embeddings.create(model=self._model, input=text)
         return list(response.data[0].embedding)

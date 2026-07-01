@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from langfuse import observe
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from ai.providers.abstract_provider import (
@@ -53,6 +54,7 @@ class InceptionLLMClient(AbstractProviderLLMClient):
             base_url=config.base_url
         )
 
+    @observe(as_type="generation")
     async def ainvoke(self, prompt: str) -> str:
         """Invoke Mercury 2 LLM with the given prompt."""
         from langchain_core.messages import HumanMessage
@@ -89,6 +91,7 @@ class InceptionEmbedderClient(AbstractProviderEmbedderClient):
             base_url=config.base_url
         )
 
+    @observe(as_type="generation")
     async def embed(self, text: str) -> list[float]:
         """Generate embeddings using Inception Labs endpoint."""
         import asyncio

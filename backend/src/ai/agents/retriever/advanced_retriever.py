@@ -57,7 +57,7 @@ def build_advanced_retriever_graph(
 
     graph = StateGraph(
         state_schema=AdvancedReaderAgentState,
-        context_schema=AdvancedReaderAgentContext,
+        context_schema=AdvancedAgentContext,
     )
     # TODO: <maybe not here but still> graph.add_node("security_checks", security_checks_step)
     graph.add_node("evaluate_needs", evaluate_needs_step)

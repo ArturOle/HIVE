@@ -6,6 +6,8 @@ import torch
 from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from langfuse import observe
+
 from ai.providers.abstract_provider import (
     AbstractProviderEmbedderClient,
     AbstractProviderLLMClient,
@@ -113,6 +115,7 @@ class QwenEmbedderClient(AbstractProviderEmbedderClient):
                 f"Error: {exc}"
             ) from exc
 
+    @observe(as_type="generation")
     async def embed(self, text: str) -> list[float]:
         """Generate embeddings using Qwen3 model.
         
@@ -208,6 +211,7 @@ class QwenLLMClient(AbstractProviderLLMClient):
                 f"{model_path} or that you have internet access. Error: {exc}"
             ) from exc
 
+    @observe(as_type="generation")
     async def ainvoke(self, prompt: str) -> str:
         """Asynchronously invoke the Qwen3 LLM.
 

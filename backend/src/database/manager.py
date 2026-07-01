@@ -18,6 +18,8 @@ import math
 import time
 import uuid
 
+from langfuse import observe
+
 from database.config import Neo4jSettings, load_cypher
 from database.infrastructure.driver import Neo4jDriver
 from database.infrastructure.repository import Neo4jRepository
@@ -412,6 +414,7 @@ class DatabaseManager:
             await self.driver.close()
             self._logger.info("DatabaseManager closed")
 
+    @observe(as_type="span")
     async def persist_knowledge(
         self,
         extraction: dict[str, str],
