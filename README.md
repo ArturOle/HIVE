@@ -7,6 +7,22 @@
 ## About the project
 **H**ierarchically **I**ndexed **V**ector **E**viroments(HIVE) is experimental agentic abstract memory system. HIVE mimics the high-level human resoning and memory recall strategies, recomposing the information into `expiriences`.
 
+## Initial setup
+### Option 1: Local shell-based setup
+1. Start the local services from the repository root with `./start_services.sh`.
+2. Install backend dependencies with `cd backend && pip install -e .`.
+3. Launch the API or frontend as needed for your workflow.
+
+### Option 2: Docker Compose setup
+1. From the repository root, run `docker compose up --build`.
+2. This starts the backend and supporting services defined in the compose configuration.
+3. Use the exposed ports from the compose file to access the API or frontend once the containers are healthy.
+
+## Orchestrator modes
+- Submit: ingest new content, extract concepts and relations, and build or extend the underlying experience graph. This is the path used when you want to add new knowledge into HIVE.
+- Retrieve: perform standard retrieval over stored experiences and return the most relevant context. It is the default flow for answering questions from the existing memory base.
+- Advanced retrieve: an experimental multi-step graph exploration and reasoning flow. It expands the retrieval process by traversing related concepts and applying more structured reasoning, but it is still in development and may change over time.
+
 ## Development stages
 
 ### 1. Proof Of Concept - *Success*
