@@ -92,11 +92,16 @@ async def test_run_submit(orchestrator):
 
     result = await orchestrator.run_submit("New entry", "dev")
     
-    orchestrator.submit_graph.ainvoke.assert_awaited_once_with({
+    orchestrator.submit_graph.ainvoke.assert_awaited_once()
+    args, kwargs = orchestrator.submit_graph.ainvoke.await_args
+    assert args[0] == {
         "text": "New entry",
         "environment_hint": "dev",
         "errors": []
-    })
+    }
+    assert "config" in kwargs
+    assert "callbacks" in kwargs["config"]
+    assert len(kwargs["config"]["callbacks"]) == 1
     assert result == {"status": "success"}
 
 @pytest.mark.asyncio
@@ -109,20 +114,30 @@ async def test_run_retrieve(orchestrator):
 
     # Test with default top_k
     result = await orchestrator.run_retrieve("Find this")
-    orchestrator.retrieve_graph.ainvoke.assert_awaited_with({
+    assert orchestrator.retrieve_graph.ainvoke.await_count == 1
+    first_args, first_kwargs = orchestrator.retrieve_graph.ainvoke.await_args_list[0]
+    assert first_args[0] == {
         "query": "Find this",
-        "top_k": 5, # default from fixture
+        "top_k": 5,
         "errors": []
-    })
+    }
+    assert "config" in first_kwargs
+    assert "callbacks" in first_kwargs["config"]
+    assert len(first_kwargs["config"]["callbacks"]) == 1
     assert result == {"results": []}
 
     # Test with overridden top_k
     await orchestrator.run_retrieve("Find this", top_k=10)
-    orchestrator.retrieve_graph.ainvoke.assert_awaited_with({
+    assert orchestrator.retrieve_graph.ainvoke.await_count == 2
+    second_args, second_kwargs = orchestrator.retrieve_graph.ainvoke.await_args_list[1]
+    assert second_args[0] == {
         "query": "Find this",
         "top_k": 10,
         "errors": []
-    })
+    }
+    assert "config" in second_kwargs
+    assert "callbacks" in second_kwargs["config"]
+    assert len(second_kwargs["config"]["callbacks"]) == 1
 
 @pytest.mark.asyncio
 async def test_run_router(orchestrator):

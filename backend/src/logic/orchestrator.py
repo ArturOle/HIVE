@@ -55,9 +55,9 @@ class AgentOrchestrator:
             llm=self.context.llm,
             embedder=self.context.embedder,
         )
-        # self.advanced_retrieve_graph = build_advanced_retriever_graph(
-        #     context=self.context
-        # )
+        self.advanced_retrieve_graph = build_advanced_retriever_graph(
+            context=self.context
+        )
 
         self._initialized = True
 
