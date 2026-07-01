@@ -50,7 +50,6 @@ async def explore_knowledge(
         errors.append("Query embedding is unavailable")
         return {"errors": errors}
 
-
     # 1. get the main target and concepts
     search_target = state.get("search_target", "").strip()
     concepts_from_query = state.get("concepts_from_query", "").strip()

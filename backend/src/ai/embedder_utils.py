@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
-from backend.src.ai.providers import QwenEmbedderClient, QwenProviderConfig
+from ai.providers import QwenEmbedderClient, QwenProviderConfig
 
 
 def get_embedder_safe(
