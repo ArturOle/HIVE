@@ -91,4 +91,3 @@ async def evaluate_needs(
         "eval_resoning": reasoning,
         "errors": errors,
     }
-'{\n  "reasoning": "The query asks for illnesses that cause fever, which is a problem (fever) the user wants to understand, so the primary intent is the problem field.",\n  "primary_intent": {\n    "field": "problem",\n    "weight": 9.0\n  },\n  "additional_concepts": {\n    "environment": [\n      {\n        "value": "illnesses",\n        "weight": 5\n      }\n    ],\n    "problem": [],\n    "solution": [],\n    "mechanism": [],\n    "result": []\n  }\n}'
