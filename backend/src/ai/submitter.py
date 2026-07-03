@@ -76,6 +76,10 @@ class WriterReflection(BaseModel):
 
 def _extract_json_object(raw: str) -> dict[str, Any]:
     """Extract first JSON object from model output."""
+    raw = raw.strip()
+    if not raw:
+        raise ValueError("Model output is empty.")
+
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
@@ -84,6 +88,26 @@ def _extract_json_object(raw: str) -> dict[str, Any]:
         if start == -1 or end == -1 or end <= start:
             raise ValueError("Model output does not contain valid JSON object")
         return json.loads(raw[start : end + 1])
+
+
+def _extract_json_payload(raw: str) -> Any:
+    """Extract a JSON object or array from model output."""
+    raw = raw.strip()
+    if not raw:
+        raise ValueError("Model output is empty.")
+
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        for open_char, close_char in (("[", "]"), ("{", "}")):
+            start = raw.find(open_char)
+            end = raw.rfind(close_char)
+            if start != -1 and end != -1 and end > start:
+                try:
+                    return json.loads(raw[start : end + 1])
+                except json.JSONDecodeError:
+                    continue
+        raise ValueError("Model output does not contain valid JSON payload")
 
 
 class WriterState(TypedDict, total=False):
@@ -125,20 +149,34 @@ def build_submitter_graph(
         raw = await llm.ainvoke(prompt)
         extractions = []
 
-        # Parse as JSON array
-        raw_data = json.loads(raw)
-        if not isinstance(raw_data, list):
-            # If it's a single object, wrap it in a list
+        try:
+            raw_data = _extract_json_payload(raw)
+        except ValueError as exc:
+            errors.append(str(exc))
+            errors.append("Discovery node failed to parse model output.")
+            return {"errors": errors}
+
+        if raw_data is None:
+            errors.append("Discovery node produced null JSON payload.")
+            return {"errors": errors}
+
+        if isinstance(raw_data, dict):
             raw_data = [raw_data]
-        
+        if not isinstance(raw_data, list):
+            errors.append("Discovery node returned JSON payload of wrong type.")
+            return {"errors": errors}
+
         for item in raw_data:
-            extraction = WriterExtraction.model_validate(item)
-            extractions.append(extraction.model_dump())
-        
+            try:
+                extraction = WriterExtraction.model_validate(item)
+                extractions.append(extraction.model_dump())
+            except Exception as exc:
+                errors.append(f"Discovery output item validation failed: {exc}")
+
         if not extractions:
             errors.append("No extractions produced from discovery node.")
             return {"errors": errors}
-        
+
         return {"extractions": extractions, "errors": errors}
 
     async def reflection_node(state: WriterState) -> WriterState:

@@ -3,17 +3,26 @@
 CONCEPT_KEYS = ("environment", "problem", "solution", "mechanism", "result")
 
 ENVIRONMENT_DEFINITION = """
-An environment is the foundational context—comprising rules, constraints, conditions, and domain artifacts—that dictates the boundaries within which a problem exists and a solution must operate.
+An environment is all relevant prior knowledge and contextual backdrop for a
+situation—the where, when, who, prior state, and conditions that existed
+before the problem occurred. It is background, not the problem itself: it
+establishes what was already true or known, within which a problem later
+emerged and a solution had to operate. Environment is broader than
+"constraints"—it includes any prior fact, setting, or state that shaped what
+happened next, whether or not it acted as a limitation.
 """
 
 PROBLEM_DEFINITION = """
-A problem is a specific tension between the current state and a desired state,
-where environmental constraints prevent an easy transition.
+A problem is the event, trigger, or issue that initiated the situation—
+something that happened, was noticed, or went wrong within the environment,
+prompting a response. Describe the concrete triggering event or issue itself
+("symptoms worsened after starting X"), not an abstract description of a gap
+between states ("suboptimal control was present").
 """
 
 SOLUTION_DEFINITION = """
-A solution is a targeted action set that works within environmental constraints
-to bridge the gap between current and desired states.
+A solution is a targeted action set that works within the environment
+to respond to the problem event and move toward a desired state.
 """
 
 RESULT_DEFINITION = """
@@ -44,19 +53,35 @@ Environment context hint:
 {environment}
 
 Environment deduction rules:
-- If `environment` is empty, generic, or not explicitly provided, infer it from the text.
-- Infer only the local context relevant to each extracted problem/solution/result.
-- Ignore unrelated sections; select only environments tied to specific tips/cases.
-- Environment may include domain artifacts (device type, runtime/language, identifiers,
-  operating conditions, constraints, and usage history) when relevant.
+- If `environment` is empty, generic, or not explicitly provided, infer it from
+  ALL relevant prior/background knowledge present in the text—not just explicit
+  constraints.
+- Capture the full contextual backdrop: where, when, who/what system, prior
+  state, and any conditions that existed before the problem occurred.
+- Infer only the local context relevant to each extracted problem/solution/result;
+  ignore unrelated sections; select only environments tied to specific tips/cases.
+- When multiple extracted concepts share the same backdrop, reuse identical
+  environment phrasing across them rather than rewording it independently each
+  time—this keeps equivalent environments mergeable downstream.
+- Environment may include domain artifacts (device type, runtime/language,
+  identifiers, operating conditions, constraints, and usage history), but is not
+  limited to constraints alone—background facts, prior state, and setting all
+  count as environment.
 
-IMPORTANT: Extract MULTIPLE concepts if present. Return as many valid concept objects as you find.
+Problem extraction rules:
+- Treat each problem as a concrete triggering event or issue—something that
+  happened, was noticed, or went wrong—not an abstract statement of a gap
+  between states.
+- Prefer the language of "what occurred" over "what is missing."
+
+IMPORTANT: Extract MULTIPLE concepts if present. Return as many valid concept
+objects as you find.
 
 Return ONLY valid JSON with this exact shape:
 [
   {{
-    "environment": "constraints, rules, and context",
-    "problem": "the tension or gap",
+    "environment": "prior knowledge and contextual backdrop",
+    "problem": "the triggering event or issue",
     "solution": "the action taken",
     "mechanism": "why this should work under the environment",
     "result": "observed outcome and ripple effects"
@@ -75,7 +100,7 @@ Text:
 """
 
 WRITER_REFLECTION_PROMPT = """
-You evaluate whether the solution resolved the problem in the environment.
+You evaluate whether the solution resolved the problem event in the environment.
 Grade from 0.0 to 5.0 based on result quality.
 
 Grading scale:
@@ -114,6 +139,21 @@ READER_CONCEPT_PARSE_PROMPT = """
 Extract any available concept fragments from the user query.
 Use null when a concept is missing.
 
+Definitions:
+{problem_definition}
+{solution_definition}
+{result_definition}
+{environment_definition}
+{mechanism_definition}
+
+Extraction rules:
+- environment: prior knowledge/background the user stated (where, when, who,
+  prior state, conditions)—not the triggering event itself.
+- problem: the concrete triggering event or issue the user described—not an
+  abstract gap they didn't actually state.
+- Only fill a field if the user's query actually contains that information;
+  do not infer or supply facts the user didn't provide. Use null otherwise.
+
 Return ONLY valid JSON with this exact shape:
 {{
   "environment": "string or null",
@@ -137,9 +177,9 @@ Your response must be:
 - Concise but complete — do not pad, do not omit critical nuance
 
 Concept fields for reference:
-- environment: the constraints and context under which the knowledge applies
-- problem: the tension or gap the concept addresses
-- solution: the action taken to resolve the problem
+- environment: the prior knowledge and contextual backdrop under which the concept applies
+- problem: the triggering event or issue the concept addresses
+- solution: the action taken to respond to the problem
 - mechanism: the reasoning for why the solution works in that environment
 - result: observed outcomes and side effects after the solution was applied
 
@@ -194,7 +234,10 @@ Definitions:
 - primary_intent: the concept field(s) the user most wants to discover, each with a weight reflecting
   relative importance
 - additional_concepts: all other concept fields recognized in the query with their values and weights;
-  weights reflect how strongly each should constrain graph traversal, independently from 1 to 10
+  weights reflect how strongly each should constrain graph traversal, independently from 1 to 10.
+  Only include a value if it is actually present in the user's query text — never supply outside
+  knowledge. environment values are prior knowledge/background the user stated (where, when, who,
+  prior state); problem values are the triggering event or issue the user described, not an inferred gap.
 - reasoning: one sentence explaining the retrieval decision and intent classification
 
 Return ONLY valid JSON with this exact shape:
@@ -203,7 +246,7 @@ Return ONLY valid JSON with this exact shape:
   "primary_intent": {{"field": "one of: environment, problem, solution, mechanism, result", "weight": 0.0}},
   "additional_concepts": {{
     "environment": [{{"value": "string or null", "weight": 0}}],
-    "problem": [{{"value": "string or null", "weight": 0}}]
+    "problem": [{{"value": "string or null", "weight": 0}}],
     "solution": [{{"value": "string or null", "weight": 0}}],
     "mechanism": [{{"value": "string or null", "weight": 0}}],
     "result": [{{"value": "string or null", "weight": 0}}]
