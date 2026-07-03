@@ -17,7 +17,7 @@ def build_advanced_retriever_graph(
 
     """Build and compile reader graph."""
  
-    async def security_checks_step(state: AdvancedReaderAgentState, context: AdvancedAgentContext) -> AdvancedReaderAgentState:
+    async def security_checks_step(state: AdvancedReaderAgentState) -> AdvancedReaderAgentState:
         """Check the user prompt for jailbrake, prompt injection, sql injection"""
         try:
             state = await evaluate_needs(state, context)
@@ -26,23 +26,31 @@ def build_advanced_retriever_graph(
             state.errors.append(str(e))
         return state
 
-    async def evaluate_needs_step(state: AdvancedReaderAgentState, context: AdvancedAgentContext) -> AdvancedReaderAgentState:
+    async def evaluate_needs_step(state: AdvancedReaderAgentState) -> AdvancedReaderAgentState:
         """Evaluate the needs of the user based on the query and knowledge base."""
         try:
-            state = await evaluate_needs(state, context)
+            return await evaluate_needs(state, context)
+            
         except Exception as e:
             logger.error(f"Error in evaluate_needs_step: {e}")
             state.errors.append(str(e))
-        return state
+            return state
     
     async def explore_knowledge_base_step(state: AdvancedReaderAgentState) -> AdvancedReaderAgentState:
         """Explore the knowledge base for relevant concepts."""
         try:
-            state = await explore_knowledge(state, context)
+            update = await explore_knowledge(state, context)
+            merged = state.model_copy(deep=True)
+            for key, value in update.items():
+                if key == "errors":
+                    merged.errors = list(merged.errors) + list(value)
+                else:
+                    setattr(merged, key, value)
+            return merged
         except Exception as e:
             logger.error(f"Error in explore_knowledge_base_step: {e}")
             state.errors.append(str(e))
-        return state
+            return state
     
     async def write_response_step(state: AdvancedReaderAgentState) -> AdvancedReaderAgentState:
         """Write the final response based on the evaluated needs and explored knowledge base."""
