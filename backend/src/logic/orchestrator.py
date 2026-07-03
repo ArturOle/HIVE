@@ -11,7 +11,7 @@ from ai.submitter import build_submitter_graph
 from database.manager import DatabaseManager
 
 from dotenv import load_dotenv
-
+from langfuse.langchain import CallbackHandler
 
 load_dotenv("/home/r2/Documents/Projects/HIVE/backend/.env")
 
@@ -55,9 +55,9 @@ class AgentOrchestrator:
             llm=self.context.llm,
             embedder=self.context.embedder,
         )
-        self.advanced_retrieve_graph = build_advanced_retriever_graph(
-            context=self.context
-        )
+        # self.advanced_retrieve_graph = build_advanced_retriever_graph(
+        #     context=self.context
+        # )
 
         self._initialized = True
 
@@ -65,13 +65,15 @@ class AgentOrchestrator:
         """Execute submit workflow."""
         if not self.submit_graph:
             raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
-
+        langfuse_handler = CallbackHandler()
         result = await self.submit_graph.ainvoke(
             {
                 "text": text,
                 "environment_hint": environment_hint,
                 "errors": [],
-            }
+            },
+            config={"callbacks": [langfuse_handler]}
+
         )
         return dict(result)
 
@@ -79,12 +81,14 @@ class AgentOrchestrator:
         """Execute reader workflow."""
         if not self.retrieve_graph:
             raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
+        langfuse_handler = CallbackHandler()
         result = await self.retrieve_graph.ainvoke(
             {
                 "query": query,
                 "top_k": top_k if top_k is not None else self.top_k,
                 "errors": [],
-            }
+            },
+            config={"callbacks": [langfuse_handler]}
         )
         return dict(result)
 
@@ -92,12 +96,14 @@ class AgentOrchestrator:
         """Execute advanced retriever workflow."""
         if not self.advanced_retrieve_graph:
             raise RuntimeError("Orchestrator not initialized. Call initialize() first.")
+        langfuse_handler = CallbackHandler()
         result = await self.advanced_retrieve_graph.ainvoke(
             {
                 "query": query,
                 "top_k": top_k if top_k is not None else self.top_k,
                 "errors": [],
-            }
+            },
+            config={"callbacks": [langfuse_handler]}
         )
         return dict(result)
 
