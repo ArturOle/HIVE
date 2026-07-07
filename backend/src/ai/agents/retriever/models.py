@@ -11,7 +11,7 @@ class AdvancedReaderAgentState(BaseModel):
     """State for the Advanced Reader Agent."""
 
     query: str
-    top_k: int | None
+    top_k: int | None = None
 
     query_embedding: list[float | int] = Field(default_factory=list)
 
@@ -23,6 +23,7 @@ class AdvancedReaderAgentState(BaseModel):
 
     errors: list[str] = Field(default_factory=list)
     llm_response: str | None = None
+    formatted_output: str | None = None
 
 
 class AdvancedAgentContext(BaseModel):
