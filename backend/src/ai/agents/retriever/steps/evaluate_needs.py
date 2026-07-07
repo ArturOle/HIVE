@@ -1,5 +1,6 @@
 
 import logging
+from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
@@ -16,10 +17,17 @@ from ai.prompts import (
 
 logger = logging.getLogger(__name__)
 
+
+def _get_state_value(state: Any, key: str, default: Any = None) -> Any:
+    if isinstance(state, dict):
+        return state.get(key, default)
+    return getattr(state, key, default)
+
+
 class EvalFields(BaseModel):
     reasoning: str
-    primary_intent: dict[str, str]
-    additional_concepts: dict[str, list[dict[str, str | int]]]
+    primary_intent: dict[str, str | float]
+    additional_concepts: dict[str, list[dict[str, str | int | float]]]
 
 
 async def evaluate_needs(
@@ -34,9 +42,15 @@ async def evaluate_needs(
         context: Holds references to system objects
     
     """
-    user_query = state.get("query", "").strip()
-    errors = list(state.get("errors", []))
-    user_query_embedding = await context.embedder.embed(user_query)
+    user_query = str(_get_state_value(state, "query", "")).strip()
+    errors = list(_get_state_value(state, "errors", []))
+    embedder = getattr(context, "embedder", None)
+
+    if not embedder:
+        errors.append("Embedder is unavailable")
+        return {"errors": errors}
+
+    user_query_embedding = await embedder.embed(user_query)
 
     if not user_query:
         errors.append("Reader query text is empty.")
@@ -54,7 +68,12 @@ async def evaluate_needs(
         result=RESULT_DEFINITION,
         query=user_query
     )
-    raw = await context.llm.ainvoke(evaluate_prompt)
+    llm = getattr(context, "llm", None)
+    if not llm:
+        errors.append("LLM is unavailable")
+        return {"errors": errors}
+
+    raw = await llm.ainvoke(evaluate_prompt)
 
     try:
         eval_results = EvalFields.model_validate_json(raw)
@@ -62,9 +81,9 @@ async def evaluate_needs(
         additional_concepts = eval_results.additional_concepts
         reasoning = eval_results.reasoning
     except (ValueError, ValidationError) as exc:
-        logger.warning("fReader parse failed, fallback enabled: {exc}")
-        errors.append(exc)
-    
+        logger.warning("fReader parse failed, fallback enabled: %s", exc)
+        errors.append(str(exc))
+
     return {
         "query_embedding": user_query_embedding,
         "search_target": primary_intent,
